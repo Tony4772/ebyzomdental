@@ -68,7 +68,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     // Server-side only (for SSR inside Docker)
-    apiBaseUrlServer: process.env.API_BASE_URL_SERVER || 'http://backend:8000',
+    apiBaseUrlServer: process.env.API_BASE_URL || 'https://ebyzomdental.onrender.com/',
     public: {
       // Client-side (browser)
       apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8000',
