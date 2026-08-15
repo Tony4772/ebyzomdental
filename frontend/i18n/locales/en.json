@@ -1,7 +1,7 @@
 {
   "app": {
-    "name": "DentalPin",
-    "tagline": "Dental clinic management"
+    "name": "EBYZOM Dental",
+    "tagline": "Gestión de clinica dental"
   },
   "demo": {
     "bannerMessage": "Public demo — do not enter real patient data. The database is reset periodically.",
