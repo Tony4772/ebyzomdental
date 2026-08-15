@@ -4,7 +4,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Build argument for API URL
-ARG API_BASE_URL=http://localhost:8000
+ARG API_BASE_URL
 ENV API_BASE_URL=$API_BASE_URL
 
 # Copy package files
