@@ -71,7 +71,7 @@ export default defineNuxtConfig({
     apiBaseUrlServer: process.env.API_BASE_URL || 'https://ebyzomdental.onrender.com/',
     public: {
       // Client-side (browser)
-      apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8000',
+      apiBaseUrl: process.env.API_BASE_URL || 'https://ebyzomdental.onrender.com',
       demoMode: process.env.NUXT_PUBLIC_DEMO_MODE === 'true',
       // Documentation portal origin used by the in-app help drawer
       // (Fase 5 of issue #75). Empty disables the help button.
