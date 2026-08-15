@@ -8,6 +8,21 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from app.config import settings
+database_url = settings.DATABASE_URL
+
+if database_url.startswith("postgresql://"):
+    database_url = database_url.replace(
+        "postgresql://",
+        "postgresql+asyncpg://",
+        1,
+    )
+
+elif database_url.startswith("postgres://"):
+    database_url = database_url.replace(
+        "postgres://",
+        "postgresql+asyncpg://",
+        1,
+    )
 
 # Create async engine with connection pool settings.
 #
@@ -18,7 +33,7 @@ from app.config import settings
 # proactively so we don't accumulate idle ones a proxy might silently
 # close.
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    database_url,
     pool_size=10,
     max_overflow=20,
     pool_timeout=30,
