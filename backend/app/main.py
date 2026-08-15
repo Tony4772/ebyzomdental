@@ -79,7 +79,12 @@ app = FastAPI(
     docs_url="/docs" if settings.ENVIRONMENT == "development" else None,
     redoc_url="/redoc" if settings.ENVIRONMENT == "development" else None,
 )
-
+@app.get("/")
+async def root():
+    return {
+        "status": "ok",
+        "service": "DentalPin API"
+    }
 # Configure rate limiter
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
