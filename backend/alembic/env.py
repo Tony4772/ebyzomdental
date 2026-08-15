@@ -2,19 +2,9 @@
 
 Supports Fase A's mixed Alembic layout:
 
-* **Main linear** — the historic chain under ``backend/alembic/versions/``.
-  Holds every migration shipped before the module-system refactor plus
-  any new migrations of modules that have not been extracted to a branch
-  (clinical and the other legacy modules in Fase A).
-* **Per-module branches** — brand-new modules keep their migrations
-  under ``backend/app/modules/<name>/migrations/versions/`` and declare
-  ``branch_labels=('<name>',)`` on the first revision. The directory is
-  discovered at env-load time; missing or empty folders are ignored, so
-  bootstrap on a fresh database works identically to before.
-
-Discovery is filesystem-based on purpose: querying ``core_module`` from
-here would create a circular dependency (the table does not exist
-during its own migration and is missing in offline ``--sql`` mode).
+* Main linear — the historic chain under ``backend/alembic/versions/``.
+* Per-module branches — module migrations under
+  ``backend/app/modules/<name>/migrations/versions/``.
 """
 
 import asyncio
@@ -126,21 +116,29 @@ MODULES_ROOT = BACKEND_ROOT / "app" / "modules"
 
 config = context.config
 
-# Set the database URL from settings
+# Configure database URL for async PostgreSQL.
+# Render may provide postgresql://, while SQLAlchemy's async engine
+# requires the asyncpg driver explicitly.
 database_url = settings.DATABASE_URL
+
 if database_url.startswith("postgresql://"):
     database_url = database_url.replace(
-        "postgresql://", "postgresql+asyncpg://", 1
+        "postgresql://",
+        "postgresql+asyncpg://",
+        1,
     )
 
 config.set_main_option("sqlalchemy.url", database_url)
 
-# Register main linear + discovered branches so Alembic can resolve heads
-# across all of them. ``version_path_separator = os`` in alembic.ini, so
-# join on ``os.pathsep``.
+# Register main linear + discovered branches.
 config.set_main_option(
     "version_locations",
-    os.pathsep.join(discover_version_locations(MAIN_LINEAR, MODULES_ROOT)),
+    os.pathsep.join(
+        discover_version_locations(
+            MAIN_LINEAR,
+            MODULES_ROOT,
+        )
+    ),
 )
 
 if config.config_file_name is not None:
@@ -150,16 +148,9 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
-
-    This configures the context with just a URL and not an Engine,
-    though an Engine is acceptable here as well. By skipping the Engine
-    creation we don't even need a DBAPI to be available.
-
-    Calls to context.execute() here emit the given string to the
-    script output.
-    """
+    """Run migrations in offline mode."""
     url = config.get_main_option("sqlalchemy.url")
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -173,16 +164,22 @@ def run_migrations_offline() -> None:
 
 def do_run_migrations(connection: Connection) -> None:
     """Run migrations with the given connection."""
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
 
 
 async def run_async_migrations() -> None:
-    """Run migrations in 'online' mode with async engine."""
+    """Run migrations using the async PostgreSQL driver."""
     connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        config.get_section(
+            config.config_ini_section,
+            {},
+        ),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
@@ -194,7 +191,7 @@ async def run_async_migrations() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode."""
+    """Run migrations in online mode."""
     asyncio.run(run_async_migrations())
 
 
