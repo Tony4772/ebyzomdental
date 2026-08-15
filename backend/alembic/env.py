@@ -127,7 +127,13 @@ MODULES_ROOT = BACKEND_ROOT / "app" / "modules"
 config = context.config
 
 # Set the database URL from settings
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+database_url = settings.DATABASE_URL
+if database_url.startswith("postgresql://"):
+    database_url = database_url.replace(
+        "postgresql://", "postgresql+asyncpg://", 1
+    )
+
+config.set_main_option("sqlalchemy.url", database_url)
 
 # Register main linear + discovered branches so Alembic can resolve heads
 # across all of them. ``version_path_separator = os`` in alembic.ini, so
