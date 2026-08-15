@@ -3,36 +3,38 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Build argument for API URL
-ARG API_BASE_URL
+# API URL
+ARG API_BASE_URL=https://eversondental.onrender.com
 ENV API_BASE_URL=$API_BASE_URL
 
-# Copy package files
-COPY package*.json ./
+# Copiar package files
+COPY frontend/package*.json ./
 
-# Install dependencies
+# Instalar dependencias
 RUN npm install
 
-# Copy source code
-COPY . .
+# Copiar frontend
+COPY frontend/ ./
 
-# Build the application
+# Copiar módulos frontend
+COPY backend/app/modules/ /module_layers/
+
+# Build Nuxt
 RUN npm run build
+
 
 # Production stage
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy built output
+# Aplicación compilada
 COPY --from=builder /app/.output /app/.output
 
-# Set environment variables
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
 
 EXPOSE 3000
 
-# Start the application
 CMD ["node", ".output/server/index.mjs"]
