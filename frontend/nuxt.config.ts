@@ -49,7 +49,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'EBYZOM dental',
+      title: 'EBYZOM Dental',
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
       ]
