@@ -2,13 +2,13 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-dental_clinic}
-      POSTGRES_USER: ${POSTGRES_USER:-dental}
+      POSTGRES_DB: ${POSTGRES_DB:-ebyzomdental_clinic}
+      POSTGRES_USER: ${POSTGRES_USER:-ebyzomdental}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dental} -d ${POSTGRES_DB:-dental_clinic}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ebyzomdental} -d ${POSTGRES_DB:-ebyzomdental_clinic}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile
     environment:
       SERVICE_FQDN_BACKEND_8000: ${BACKEND_FQDN}
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-dental}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-dental_clinic}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-ebyzomdental}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-ebyzomdental_clinic}
       SECRET_KEY: ${SECRET_KEY}
       ENVIRONMENT: production
       ALLOWED_ORIGINS: ${FRONTEND_URL}

@@ -113,10 +113,10 @@
   a real 500-patient Gesdén export: invoices imported climbed from
   7 → 554 (547 had been failing as ``mapper.failed``).
 - feat(catalog_item): new generic dispatcher mapper. Handles
-  ``catalog_item`` (DPMF) → DentalPin. Today only ``kind=chair``
+  ``catalog_item`` (DPMF) → EBYZOM dental. Today only ``kind=chair``
   produces real rows: Gesdén ``TBoxes`` entries land as
   :class:`agenda.Cabinet` so imported appointments resolve a real
-  ``cabinet_id`` instead of always landing on the DentalPin demo
+  ``cabinet_id`` instead of always landing on the EBYZOM dental demo
   cabinets. Other kinds (country, province, payment_method, …)
   archive to :class:`RawEntity` for forward-compat. The
   ``AppointmentMapper`` now resolves ``chair_uuid`` through the new
@@ -162,7 +162,7 @@
   ``mappers/_gesden_catalog`` so both stay in sync. Removes the
   partial 14-entry duplicate that used to live inside
   ``applied_treatment.py``.
-- fix(catalog): match Gesdén ``Tratamientos`` against the DentalPin
+- fix(catalog): match Gesdén ``Tratamientos`` against the EBYZOM dental
   seed even when the source label uses abbreviations/dots
   ("OBTUR. COMP.", "ENDODONCIA UNI."). The previous matcher required a
   lower-cased exact hit on ``names->>'es'`` so practically every
@@ -199,7 +199,7 @@
   ``applied_treatment`` mapping so a ``DeudaCli`` pointing at the
   planned row still lands on the realised twin.
 - feat(payment): negative ``PagoCli`` rows now create
-  ``payments.Refund`` rows tied to a DentalPin ``Payment`` instead
+  ``payments.Refund`` rows tied to a EBYZOM dental ``Payment`` instead
   of being skipped. ``_resolve_refund_target`` tries three
   canonical-space signals in order: (1) explicit chain via
   ``related_payment_uuid`` (``IdPagoCliRelacionado``), (2) first
@@ -498,7 +498,7 @@
   ``source_module !== 'migration_import'``; the migrated record stays
   visible in the History tab and as PlannedTreatmentItems on the
   imported plans.
-- fix(professional): map canonical role ``doctor`` → DentalPin
+- fix(professional): map canonical role ``doctor`` → EBYZOM dental
   ``dentist`` (was silently falling through to ``assistant``, so every
   Gesdén dentist landed as auxiliar), and create the imported User
   with ``is_active=True`` so the Users page shows them as active.
@@ -641,7 +641,7 @@
   case), with the other 20 promoted to completed.
 - fix(applied_treatment): migrated plans land in ``active`` instead of
   ``draft``. Gesdén plans are historical, post-acceptance records —
-  leaving them in DentalPin's pre-confirmation state forced the
+  leaving them in EBYZOM dental's pre-confirmation state forced the
   operator to manually confirm every imported plan before any
   consumer (budgets, payments, reports) treated it as real. ``active``
   is the natural post-acceptance state in the plan machine and is
@@ -661,7 +661,7 @@
   per ``TtosMedFases``. Without the inheritance, sessions of
   completed items stayed ``pending`` and dragged item-level
   earned-ledger semantics off.
-- feat(applied_treatment): map Gesdén ``IdTipoOdg`` to DentalPin's
+- feat(applied_treatment): map Gesdén ``IdTipoOdg`` to EBYZOM dental's
   ``TreatmentType`` enum (implant / crown / bridge / extraction /
   filling_composite / root_canal_full / veneer / sealant / band /
   bracket / post / apicoectomy …) instead of hard-coding
@@ -712,11 +712,11 @@
   (not ``paid_at``) and a numeric ``payment_kind`` code (not the
   English string ``method``); both are now read and the Gesdén
   ``Tipo`` code is decoded against ``_PAYMENT_KIND_MAP`` so real
-  ``cash``/``card``/``bank_transfer`` etc. land in DentalPin instead
+  ``cash``/``card``/``bank_transfer`` etc. land in EBYZOM dental instead
   of every payment defaulting to ``other``.
 - feat(mappers): new ``PatientClientLinkMapper`` plus client→patient
   resolution in ``PaymentMapper``. In Gesdén ``DCobros`` references
-  the *client* (payer), not the patient — DentalPin's flat
+  the *client* (payer), not the patient — EBYZOM dental's flat
   ``Payment.patient_id`` couldn't be derived from the canonical row
   alone. The new mapper walks ``patient_client_link`` payloads and
   writes a secondary ``patient_for_client`` mapping (one row per
@@ -727,7 +727,7 @@
   to a direct ``patient_uuid``. Ambiguous clients (multiple patients
   linked) emit a ``patient_client_link.ambiguous_payer`` info
   warning so the operator can reconcile manually.
-- feat(catalog): reuse existing DentalPin catalog items when the
+- feat(catalog): reuse existing EBYZOM dental catalog items when the
   imported Spanish name matches an active item (1:1, case- and
   whitespace-normalised). On a unique match the resolver mapping
   points at the existing row and a ``catalog.matched_existing``
@@ -762,7 +762,7 @@
 - feat(mappers): new ``AppliedTreatmentPhaseMapper`` attaches DPMF
   ``applied_treatment_phase`` rows as
   ``PlannedTreatmentItemSession`` children of the imported plan
-  item. Per-session amount is left at zero (DentalPin sessions carry
+  item. Per-session amount is left at zero (EBYZOM dental sessions carry
   an absolute amount; the canonical ``percent_to_bill`` is exposed
   in the session label instead — clinics can rebalance manually).
 - chore(manifest): add ``odontogram`` to ``depends`` (used by
@@ -777,9 +777,9 @@
   duplicate codes across tariff variants.
 - feat(mappers): new ``CatalogVariantMapper`` resolves
   ``treatment_catalog_variant`` to the parent
-  ``treatment_catalog_item`` (pipe-through). DentalPin's catalog
+  ``treatment_catalog_item`` (pipe-through). EBYZOM dental's catalog
   doesn't model a per-tariff axis, so the variant's canonical UUID
-  resolves to the same DentalPin row as its parent; pricing
+  resolves to the same EBYZOM dental row as its parent; pricing
   differences survive as ``budget_line.unit_amount`` snapshots.
 - feat(mappers): new ``BudgetMapper`` + ``BudgetLineMapper`` materialise
   DPMF ``budget`` / ``budget_line`` into ``budget.Budget`` /
@@ -801,7 +801,7 @@
   :class:`MappingResolver`, combines ``scheduled_date`` +
   ``scheduled_time`` into a UTC ``start_time`` (computes ``end_time``
   from ``duration_minutes``, default 30), maps ``coarse_status`` →
-  DentalPin's 7-state status enum, and emits warnings under
+  EBYZOM dental's 7-state status enum, and emits warnings under
   ``appointment.{missing_actor,unmapped_actor,no_schedule,unparseable_datetime}``
   when an entity has to be skipped instead of silently dropped. Chair
   resolution is deferred until a ``catalog_item`` mapper exists.
@@ -820,7 +820,7 @@
   user-manual files are now aligned.
 - fix(lifecycle): default ``_staging_root()`` to
   ``{STORAGE_LOCAL_PATH}/migration-import`` instead of
-  ``/var/lib/dentalpin/migration-import``. The previous hardcoded path
+  ``/var/lib/ebyzomdental/migration-import``. The previous hardcoded path
   was outside any volume the backend container can write to (running
   as ``appuser``), so installing the module failed with ``[Errno 13]
   Permission denied`` on a stock docker-compose setup. The

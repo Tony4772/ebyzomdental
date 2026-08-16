@@ -6,8 +6,8 @@ body:
     attributes:
       value: |
         Installation trouble is usually faster to sort out in
-        [Q&A](https://github.com/martinezsalmeron/dentalpin/discussions/categories/q-a)
-        or on [Telegram](https://t.me/dentalpin). Use this form when the
+        [Q&A](https://github.com/martinezsalmeron/ebyzomdental/discussions/categories/q-a)
+        or on [Telegram](https://t.me/ebyzomdental). Use this form when the
         software itself misbehaves.
 
   - type: textarea

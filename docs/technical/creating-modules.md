@@ -1,6 +1,6 @@
-# Creating DentalPin modules
+# Creating EBYZOM dental modules
 
-A complete guide to shipping a DentalPin module — backend, frontend,
+A complete guide to shipping a EBYZOM dental module — backend, frontend,
 migrations, seeds, tests, distribution — from scratch. Written for
 contributors who have never read the core codebase.
 
@@ -14,7 +14,7 @@ bug fixes.
 > been split into `patients`, `patients_clinical`, `agenda` and
 > `patient_timeline`; every official module now ships its frontend as
 > a Nuxt layer. Report gaps at
-> https://github.com/dentalpin/dentalpin/issues.
+> https://github.com/martinezsalmeron/ebyzomdental/issues.
 
 ---
 
@@ -46,9 +46,9 @@ intentionally minimal in v1; richer verification (signatures,
 marketplace) is post-v1.
 
 - **Official** modules ship inside `backend/app/modules/<name>/` and
-  are installed-by-default on every DentalPin instance.
+  are installed-by-default on every EBYZOM dental instance.
 - **Community** modules live in their own git repo, publish to PyPI,
-  and are installed via `pip install` + `dentalpin modules install`.
+  and are installed via `pip install` + `ebyzomdental modules install`.
 
 ### Manifest
 
@@ -58,7 +58,7 @@ See `docs/technical/core-api.md` for the full schema. Key fields:
 |-------|----------|---------|
 | `name` | yes | Unique id (snake_case). Becomes the API prefix `/api/v1/<name>/` and the permission namespace. |
 | `version` | yes | Semver `X.Y.Z`. Bumped per the rules in §8. |
-| `summary` / `author` / `license` | recommended | Shown in `dentalpin modules info`. |
+| `summary` / `author` / `license` | recommended | Shown in `ebyzomdental modules info`. |
 | `category` | yes | `official` or `community`. |
 | `min_core_version` | recommended | Reject install if core is older. |
 | `depends` | yes (list) | Module names that must install first. |
@@ -96,18 +96,18 @@ touch app/modules/inventory/{__init__.py,models.py,schemas.py,router.py,service.
 Add the entry point in `backend/pyproject.toml`:
 
 ```toml
-[project.entry-points."dentalpin.modules"]
+[project.entry-points."ebyzomdental.modules"]
 inventory = "app.modules.inventory:InventoryModule"
 ```
 
-Restart the backend, run `dentalpin modules list` — your module now
+Restart the backend, run `ebyzomdental modules list` — your module now
 appears as `uninstalled`.
 
 ### B. Community module (standalone repo)
 
 ```bash
 # Start from the template
-git clone https://github.com/dentalpin/dentalpin-module-template my-module
+git clone https://github.com/martinezsalmeron/ebyzomdental-module-template my-module
 cd my-module
 ```
 
@@ -118,11 +118,11 @@ layer with one page, slot registration. Rename, adjust, publish:
 pip install -e .
 ```
 
-Inside the DentalPin instance:
+Inside the EBYZOM dental instance:
 
 ```bash
-./bin/dentalpin modules install my_module
-./bin/dentalpin modules restart
+./bin/ebyzomdental modules install my_module
+./bin/ebyzomdental modules restart
 docker compose build frontend && docker compose up -d frontend
 ```
 
@@ -135,9 +135,9 @@ Open `/my-module` in the app — the module is live.
 Walk through every file of a minimal module. File tree:
 
 ```
-dentalpin_inventory/                        # Python package
+ebyzomdental_inventory/                        # Python package
 ├── pyproject.toml
-├── dentalpin_inventory/
+├── ebyzomdental_inventory/
 │   ├── __init__.py
 │   ├── manifest.py
 │   ├── models.py
@@ -170,13 +170,13 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "dentalpin-inventory"
+name = "ebyzomdental-inventory"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = ["dentalpin-core>=1.0"]
+dependencies = ["ebyzomdental-core>=1.0"]
 
-[project.entry-points."dentalpin.modules"]
-inventory = "dentalpin_inventory:InventoryModule"
+[project.entry-points."ebyzomdental.modules"]
+inventory = "ebyzomdental_inventory:InventoryModule"
 ```
 
 ### `__init__.py`
@@ -468,7 +468,7 @@ alembic revision --autogenerate \
 ```
 
 (For community modules, swap the `--version-path` for
-`dentalpin_inventory/migrations/versions`.)
+`ebyzomdental_inventory/migrations/versions`.)
 
 `backend/alembic.ini`'s `version_locations` lists every module's
 `migrations/versions` directory so `alembic history | heads | upgrade`
@@ -675,7 +675,7 @@ Modules never hot-load. CLI responses and REST endpoints always return
 "restart required" after a state change. Restart via:
 
 - REST: `POST /api/v1/modules/-/restart`
-- CLI hint: `./bin/dentalpin modules rebuild-frontend`
+- CLI hint: `./bin/ebyzomdental modules rebuild-frontend`
 - Host: `docker compose restart backend`
 
 ---
@@ -819,7 +819,7 @@ The core's `tests/conftest.py` exposes:
 - `auth_headers` — Bearer token for a registered user
 
 Community modules can import these via pytest discovery once
-`dentalpin-core[tests]` is a dev dependency.
+`ebyzomdental-core[tests]` is a dev dependency.
 
 ### What to cover
 
@@ -860,7 +860,7 @@ async def test_create_item(client, auth_headers):
 1. Add `backend/app/modules/<name>/` with the files above.
 2. Register the entry point in `backend/pyproject.toml`.
 3. Open a PR to the main repo.
-4. Ship as part of the next DentalPin release.
+4. Ship as part of the next EBYZOM dental release.
 
 ### Community module
 
@@ -870,9 +870,9 @@ async def test_create_item(client, auth_headers):
 4. Document the install steps in your README:
 
 ```bash
-pip install dentalpin-my-module
-./bin/dentalpin modules install my_module
-./bin/dentalpin modules restart
+pip install ebyzomdental-my-module
+./bin/ebyzomdental modules install my_module
+./bin/ebyzomdental modules restart
 docker compose build frontend && docker compose up -d frontend
 ```
 
@@ -886,11 +886,11 @@ main repo — you own the code, the releases and the support.
 ### CLI
 
 ```bash
-./bin/dentalpin modules list              # everything + state
-./bin/dentalpin modules info inventory    # full metadata
-./bin/dentalpin modules status            # pending + errored summary
-./bin/dentalpin modules doctor            # orphans, missing deps, manifest errors
-./bin/dentalpin modules sync-frontend     # regenerate modules.json
+./bin/ebyzomdental modules list              # everything + state
+./bin/ebyzomdental modules info inventory    # full metadata
+./bin/ebyzomdental modules status            # pending + errored summary
+./bin/ebyzomdental modules doctor            # orphans, missing deps, manifest errors
+./bin/ebyzomdental modules sync-frontend     # regenerate modules.json
 ```
 
 ### Useful SQL
@@ -1009,7 +1009,7 @@ def upgrade() -> None:
 
 ## 12. AI agent integration
 
-Every module in DentalPin participates in the AI agent contract. The
+Every module in EBYZOM dental participates in the AI agent contract. The
 contract is intentionally thin so modules can start as "agent-aware"
 without committing to LLMs or long-running autonomy up front.
 
@@ -1210,7 +1210,7 @@ Before tagging a community module release:
 
 - [ ] `pytest` passes locally
 - [ ] `ruff check .` and `ruff format --check .` are clean
-- [ ] `dentalpin modules doctor` reports no issues after install
+- [ ] `ebyzomdental modules doctor` reports no issues after install
 - [ ] `CHANGELOG.md` has an entry for the new version
 - [ ] `README.md` has install + config instructions
 - [ ] `version` bumped per §8 rules
@@ -1222,13 +1222,13 @@ Before tagging a community module release:
 ## 14. Governance
 
 - **Community modules stay in their own repos** and are not merged
-  into the DentalPin monorepo.
+  into the EBYZOM dental monorepo.
 - **Official modules** are maintained by the core team; PRs welcome
   through the usual review process.
 - A **registry of known community modules** will appear at
   `docs/community-modules.md` once the first third-party modules
   exist. Inclusion is informational; it is not an endorsement.
-- **Security reports**: email security@dentalpin.example (placeholder
+- **Security reports**: email security@ebyzomdental.example (placeholder
   until the first release). Critical issues trigger a coordinated
   disclosure.
 - **Breaking changes to the core API** follow the deprecation policy

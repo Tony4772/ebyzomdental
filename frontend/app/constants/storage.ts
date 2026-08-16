@@ -1,6 +1,6 @@
 export const STORAGE_KEYS = {
-  LOCALE: 'dentalpin:locale',
+  LOCALE: 'ebyzomdental:locale',
   DENSITY: 'ui:density',
   onboardingDismissed: (clinicId: string) =>
-    `dentalpin.settings.onboarding.dismissed:${clinicId}`
+    `ebyzomdental.settings.onboarding.dismissed:${clinicId}`
 } as const
