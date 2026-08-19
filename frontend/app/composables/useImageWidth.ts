@@ -6,7 +6,9 @@ import { ref, watchEffect, type Ref } from 'vue'
 export function useImageWidth(bgImage: string, sectionHeight: Ref<number>) {
   const imageWidth = ref(0)
 
+  // watchEffect runs during SSR, but Image is only available in the browser.
   watchEffect(() => {
+    if (import.meta.server) return
     if (!bgImage) return
 
     const img = new Image()
