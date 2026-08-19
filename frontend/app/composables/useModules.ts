@@ -20,7 +20,7 @@ const HOST_NAV: NavigationItem[] = [
   {
     label: 'nav.dashboard',
     icon: 'i-lucide-home',
-    to: '/dashboard',
+    to: '/',
     order: 0
   },
   {
