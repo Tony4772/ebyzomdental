@@ -66,18 +66,18 @@ useHead({
 
     <!-- SECTION 1 - HERO -->
     <section
-      ref="s1Reveal.containerRef"
+      :ref="el => s1Reveal.containerRef.value = (el as HTMLElement)"
       class="h-screen w-full overflow-hidden flex flex-col pt-24 md:pt-24 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2"
     >
       <MaskedCard
         v-for="(feature, i) in featureBars"
         :key="feature"
-        ref="s1CardRefs"
+        :ref="el => { if (el) s1CardRefs[i] = (el as any).$el || el }"
         :bg-image="HERO_IMAGE"
         :position="s1Positions[i]"
         :image-width="s1ImageWidth"
         :focal-x="s1FocalX"
-        className="w-full h-14 md:h-20 shrink-0 rounded-xl md:rounded-2xl overflow-hidden relative"
+        class="w-full h-14 md:h-20 shrink-0 rounded-xl md:rounded-2xl overflow-hidden relative"
         :style="s1Reveal.getAnimStyle(i)"
       >
         <span class="flex items-center justify-center h-full text-black text-lg md:text-3xl font-bold text-center relative z-10">
@@ -86,12 +86,12 @@ useHead({
       </MaskedCard>
 
       <MaskedCard
-        ref="s1CardRefs"
+        :ref="el => { if (el) s1CardRefs[3] = (el as any).$el || el }"
         :bg-image="HERO_IMAGE"
         :position="s1Positions[3]"
         :image-width="s1ImageWidth"
         :focal-x="s1FocalX"
-        className="w-full flex-1 min-h-0 rounded-xl md:rounded-2xl overflow-hidden relative"
+        class="w-full flex-1 min-h-0 rounded-xl md:rounded-2xl overflow-hidden relative"
         :style="s1Reveal.getAnimStyle(3)"
       >
         <div class="absolute top-4 left-4 md:top-7 md:left-7 text-black text-xs md:text-sm font-semibold leading-4 md:leading-5 max-w-[200px] md:max-w-[300px] z-10">
@@ -111,18 +111,18 @@ useHead({
 
     <!-- SECTION 2 - SMILE GALLERY -->
     <section
-      ref="s2Reveal.containerRef"
+      :ref="el => s2Reveal.containerRef.value = (el as HTMLElement)"
       class="min-h-screen md:h-screen w-full overflow-hidden flex flex-col pt-1.5 md:pt-2 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2"
     >
       <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[auto_auto_auto_auto] md:grid-rows-[1fr_1fr_0.8fr] gap-1.5 md:gap-2">
         <!-- Card 0 -->
         <MaskedCard
-          ref="s2CardRefs"
+          :ref="el => { if (el) s2CardRefs[0] = (el as any).$el || el }"
           :bg-image="SECTION2_IMAGE"
           :position="s2Positions[0]"
           :image-width="s2ImageWidth"
           :focal-x="s2FocalX"
-          className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
+          class="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
           :style="s2Reveal.getAnimStyle(0)"
         >
           <div class="absolute top-4 left-5 md:top-6 md:left-7 text-white md:text-black text-2xl md:text-3xl font-bold z-10">
@@ -135,12 +135,12 @@ useHead({
 
         <!-- Card 1 -->
         <MaskedCard
-          ref="s2CardRefs"
+          :ref="el => { if (el) s2CardRefs[1] = (el as any).$el || el }"
           :bg-image="SECTION2_IMAGE"
           :position="s2Positions[1]"
           :image-width="s2ImageWidth"
           :focal-x="s2FocalX"
-          className="md:row-span-2 rounded-xl md:rounded-2xl overflow-hidden relative min-h-[200px] md:min-h-0"
+          class="md:row-span-2 rounded-xl md:rounded-2xl overflow-hidden relative min-h-[200px] md:min-h-0"
           :style="s2Reveal.getAnimStyle(1)"
         >
           <div class="absolute bottom-16 left-5 md:bottom-20 md:left-7 text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 z-10">
@@ -156,12 +156,12 @@ useHead({
 
         <!-- Card 2 -->
         <MaskedCard
-          ref="s2CardRefs"
+          :ref="el => { if (el) s2CardRefs[2] = (el as any).$el || el }"
           :bg-image="SECTION2_IMAGE"
           :position="s2Positions[2]"
           :image-width="s2ImageWidth"
           :focal-x="s2FocalX"
-          className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
+          class="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
           :style="s2Reveal.getAnimStyle(2)"
         >
           <h2 class="absolute top-4 left-5 md:top-6 md:left-7 text-white md:text-black text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.9] z-10 uppercase">
@@ -171,12 +171,12 @@ useHead({
 
         <!-- Card 3 -->
         <MaskedCard
-          ref="s2CardRefs"
+          :ref="el => { if (el) s2CardRefs[3] = (el as any).$el || el }"
           :bg-image="SECTION2_IMAGE"
           :position="s2Positions[3]"
           :image-width="s2ImageWidth"
           :focal-x="s2FocalX"
-          className="col-span-1 md:col-span-2 rounded-xl md:rounded-2xl overflow-hidden relative min-h-[200px] md:min-h-0"
+          class="col-span-1 md:col-span-2 rounded-xl md:rounded-2xl overflow-hidden relative min-h-[200px] md:min-h-0"
           :style="s2Reveal.getAnimStyle(3)"
         >
           <div class="absolute inset-0 z-10 flex flex-wrap md:flex-nowrap gap-1.5 md:gap-2 p-2 md:p-3">
@@ -207,7 +207,7 @@ useHead({
 
     <!-- SECTION 3 - IMPLANT DENTISTRY -->
     <section
-      ref="s3Reveal.containerRef"
+      :ref="el => s3Reveal.containerRef.value = (el as HTMLElement)"
       class="min-h-screen md:h-screen w-full overflow-hidden flex flex-col pt-1.5 md:pt-2 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2"
     >
       <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-1.5 md:gap-2">

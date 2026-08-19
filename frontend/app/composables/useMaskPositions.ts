@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, type Ref } from 'vue'
+import { ref, onMounted, onUnmounted, type Ref, watch } from 'vue'
 
 export interface MaskPosition {
   x: number
@@ -9,7 +9,6 @@ export interface MaskPosition {
 
 /**
  * Composable to handle shared background image masking logic.
- * Takes a ref to the section container and a ref to an array of card elements.
  */
 export function useMaskPositions(
   containerRef: Ref<HTMLElement | null>,
@@ -23,6 +22,9 @@ export function useMaskPositions(
     const containerRect = containerRef.value.getBoundingClientRect()
     const sw = containerRect.width
     const sh = containerRect.height
+
+    // If height is 0, we might need to wait or layout hasn't happened
+    if (sh === 0) return
 
     positions.value = cardRefs.value.map((card) => {
       if (!card) return { x: 0, y: 0, sw, sh }
@@ -39,14 +41,21 @@ export function useMaskPositions(
   let observer: ResizeObserver | null = null
 
   onMounted(() => {
-    if (containerRef.value) {
-      observer = new ResizeObserver(updatePositions)
-      observer.observe(containerRef.value)
-      updatePositions()
-      // Initial delay to ensure layout is settled
-      setTimeout(updatePositions, 100)
+    // Retry logic if refs are not ready
+    const init = () => {
+      if (containerRef.value) {
+        observer = new ResizeObserver(updatePositions)
+        observer.observe(containerRef.value)
+        updatePositions()
+      } else {
+        setTimeout(init, 50)
+      }
     }
+    init()
   })
+
+  // Watch for changes in cardRefs to update positions
+  watch(() => cardRefs.value.length, updatePositions)
 
   onUnmounted(() => {
     if (observer) {
