@@ -7,9 +7,6 @@ export interface MaskPosition {
   sh: number
 }
 
-/**
- * Composable to handle shared background image masking logic.
- */
 export function useMaskPositions(
   containerRef: Ref<HTMLElement | null>,
   cardRefs: Ref<(HTMLElement | null)[]>
@@ -23,7 +20,6 @@ export function useMaskPositions(
     const sw = containerRect.width
     const sh = containerRect.height
 
-    // If height is 0, we might need to wait or layout hasn't happened
     if (sh === 0) return
 
     positions.value = cardRefs.value.map((card) => {
@@ -38,33 +34,27 @@ export function useMaskPositions(
     })
   }
 
-  let observer: ResizeObserver | null = null
+  let resizeObserver: ResizeObserver | null = null
 
   onMounted(() => {
-    // Retry logic if refs are not ready
-    const init = () => {
-      if (containerRef.value) {
-        observer = new ResizeObserver(updatePositions)
-        observer.observe(containerRef.value)
-        updatePositions()
-      } else {
-        setTimeout(init, 50)
-      }
+    if (containerRef.value) {
+      resizeObserver = new ResizeObserver(updatePositions)
+      resizeObserver.observe(containerRef.value)
+      // Forzar actualizaciones iniciales
+      updatePositions()
+      setTimeout(updatePositions, 100)
+      setTimeout(updatePositions, 500)
     }
-    init()
+    window.addEventListener('resize', updatePositions)
   })
-
-  // Watch for changes in cardRefs to update positions
-  watch(() => cardRefs.value.length, updatePositions)
 
   onUnmounted(() => {
-    if (observer) {
-      observer.disconnect()
-    }
+    resizeObserver?.disconnect()
+    window.removeEventListener('resize', updatePositions)
   })
 
-  return {
-    positions,
-    updatePositions
-  }
+  // Re-calcular si el número de tarjetas cambia
+  watch(() => cardRefs.value.length, updatePositions)
+
+  return { positions, updatePositions }
 }

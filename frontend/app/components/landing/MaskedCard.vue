@@ -13,18 +13,16 @@ interface Props {
   position?: MaskPosition
   imageWidth?: number
   focalX?: number
-  className?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   focalX: 0.8,
-  imageWidth: 0,
-  className: ''
+  imageWidth: 0
 })
 
 const cardStyle = computed<CSSProperties>(() => {
   const { position, imageWidth, focalX, bgImage } = props
-  if (!position || !bgImage) return {}
+  if (!position || !bgImage || position.sh === 0) return { backgroundColor: '#f5f5f5' }
 
   const overflow = imageWidth > position.sw ? imageWidth - position.sw : 0
   const focalOffset = overflow * focalX
@@ -39,10 +37,7 @@ const cardStyle = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <div
-    :class="className"
-    :style="cardStyle"
-  >
+  <div :style="cardStyle">
     <slot />
   </div>
 </template>

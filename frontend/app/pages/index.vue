@@ -5,6 +5,7 @@ definePageMeta({
   layout: false
 })
 
+// URLs de imágenes (EXACTAS del landinpage.txt)
 const HERO_IMAGE = 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260624_113640_ccf3cf97-d447-425b-a134-d7b09fc743fc.png&w=1280&q=85';
 const SECTION2_IMAGE = 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260624_114219_414dfe80-f15c-4e25-bf52-b13721f4bd88.png&w=1280&q=85';
 const SECTION3_IMG1 = 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260624_115253_c19ab167-8dd5-48b4-967d-b9f0d9d6e8fb.png&w=1280&q=85';
@@ -12,7 +13,6 @@ const SECTION3_IMG2 = 'https://images.higgs.ai/?default=1&output=webp&url=https%
 const SECTION3_BG = 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260624_114355_752ba9e6-0942-4abb-9047-5d9bb16632e9.png&w=1280&q=85';
 
 const featureBars = ['Odontología Avanzada', 'Equipamiento de Alta Calidad', 'Atención Especializada'];
-
 const services = [
   { name: 'Carillas\nDentales', num: '01', active: true },
   { name: 'Coronas\nDentales', num: '02', active: false },
@@ -22,21 +22,21 @@ const services = [
 
 const showSplash = ref(true)
 
-// Section 1 logic
+// Sección 1 - Lógica
 const s1Reveal = useStaggeredReveal()
 const s1CardRefs = ref<(HTMLElement | null)[]>([])
 const { positions: s1Positions } = useMaskPositions(s1Reveal.containerRef, s1CardRefs)
 const s1Height = computed(() => s1Positions.value[0]?.sh || 0)
 const s1ImageWidth = useImageWidth(HERO_IMAGE, s1Height)
 
-// Section 2 logic
+// Sección 2 - Lógica
 const s2Reveal = useStaggeredReveal()
 const s2CardRefs = ref<(HTMLElement | null)[]>([])
 const { positions: s2Positions } = useMaskPositions(s2Reveal.containerRef, s2CardRefs)
 const s2Height = computed(() => s2Positions.value[0]?.sh || 0)
 const s2ImageWidth = useImageWidth(SECTION2_IMAGE, s2Height)
 
-// Section 3 logic
+// Sección 3 - Lógica
 const s3Reveal = useStaggeredReveal()
 
 const isMobile = ref(false)
@@ -57,16 +57,16 @@ useHead({
 </script>
 
 <template>
-  <div class="bg-white text-black min-h-screen font-['Open_Sauce_One',_sans-serif] selection:bg-black selection:text-white">
+  <div class="bg-white text-black min-h-screen font-['Open_Sauce_One',_sans-serif] selection:bg-black selection:text-white overflow-x-hidden">
     <SplashScreen
       v-if="showSplash"
       @complete="showSplash = false"
     />
     <LandingNavbar />
 
-    <!-- SECTION 1 - HERO -->
+    <!-- SECCIÓN 1 - HERO -->
     <section
-      :ref="el => s1Reveal.containerRef.value = (el as HTMLElement)"
+      ref="s1Reveal.containerRef"
       class="h-screen w-full overflow-hidden flex flex-col pt-24 md:pt-24 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2"
     >
       <MaskedCard
@@ -99,7 +99,7 @@ useHead({
         </div>
         <div class="absolute bottom-5 left-3 md:bottom-8 md:left-4 z-10">
           <span class="block text-black text-xs md:text-sm font-semibold mb-1 md:mb-2">Tu Clínica Dental de Confianza</span>
-          <h1 class="text-black text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.79] tracking-tight uppercase">
+          <h1 class="text-black text-[clamp(2.5rem,10vw,10rem)] font-bold leading-[0.79] tracking-tight uppercase">
             Cuidado<br>Dental
           </h1>
         </div>
@@ -109,13 +109,12 @@ useHead({
       </MaskedCard>
     </section>
 
-    <!-- SECTION 2 - SMILE GALLERY -->
+    <!-- SECCIÓN 2 - GALERÍA -->
     <section
-      :ref="el => s2Reveal.containerRef.value = (el as HTMLElement)"
+      ref="s2Reveal.containerRef"
       class="min-h-screen md:h-screen w-full overflow-hidden flex flex-col pt-1.5 md:pt-2 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2"
     >
       <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[auto_auto_auto_auto] md:grid-rows-[1fr_1fr_0.8fr] gap-1.5 md:gap-2">
-        <!-- Card 0 -->
         <MaskedCard
           :ref="el => { if (el) s2CardRefs[0] = (el as any).$el || el }"
           :bg-image="SECTION2_IMAGE"
@@ -133,7 +132,6 @@ useHead({
           </div>
         </MaskedCard>
 
-        <!-- Card 1 -->
         <MaskedCard
           :ref="el => { if (el) s2CardRefs[1] = (el as any).$el || el }"
           :bg-image="SECTION2_IMAGE"
@@ -154,7 +152,6 @@ useHead({
           </NuxtLink>
         </MaskedCard>
 
-        <!-- Card 2 -->
         <MaskedCard
           :ref="el => { if (el) s2CardRefs[2] = (el as any).$el || el }"
           :bg-image="SECTION2_IMAGE"
@@ -164,12 +161,11 @@ useHead({
           class="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
           :style="s2Reveal.getAnimStyle(2)"
         >
-          <h2 class="absolute top-4 left-5 md:top-6 md:left-7 text-white md:text-black text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.9] z-10 uppercase">
+          <h2 class="absolute top-4 left-5 md:top-6 md:left-7 text-white md:text-black text-[clamp(2.5rem,7vw,6rem)] font-bold leading-[0.9] z-10 uppercase">
             Cambio de<br>Sonrisa
           </h2>
         </MaskedCard>
 
-        <!-- Card 3 -->
         <MaskedCard
           :ref="el => { if (el) s2CardRefs[3] = (el as any).$el || el }"
           :bg-image="SECTION2_IMAGE"
@@ -205,19 +201,18 @@ useHead({
       </div>
     </section>
 
-    <!-- SECTION 3 - IMPLANT DENTISTRY -->
+    <!-- SECCIÓN 3 - IMPLANTES -->
     <section
-      :ref="el => s3Reveal.containerRef.value = (el as HTMLElement)"
+      ref="s3Reveal.containerRef"
       class="min-h-screen md:h-screen w-full overflow-hidden flex flex-col pt-1.5 md:pt-2 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2"
     >
       <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-1.5 md:gap-2">
-        <!-- LEFT COLUMN -->
         <div class="flex flex-col gap-1.5 md:gap-2">
           <div
             class="rounded-xl md:rounded-2xl bg-stone-50 p-5 md:p-7 flex flex-col justify-between flex-[1.2] min-h-[180px] md:min-h-0"
             :style="s3Reveal.getAnimStyle(0)"
           >
-            <h2 class="text-[clamp(3rem,7vw,6.5rem)] font-bold leading-[0.95] text-black uppercase">
+            <h2 class="text-[clamp(2.5rem,7vw,6.5rem)] font-bold leading-[0.95] text-black uppercase">
               Implantología<br>Dental
             </h2>
             <p class="text-xs md:text-sm font-semibold text-black">
@@ -230,18 +225,10 @@ useHead({
             :style="s3Reveal.getAnimStyle(1)"
           >
             <div class="flex-1 rounded-xl md:rounded-2xl overflow-hidden">
-              <img
-                :src="SECTION3_IMG1"
-                alt="Procedimiento de implante dental"
-                class="w-full h-full object-cover"
-              >
+              <img :src="SECTION3_IMG1" alt="Procedimiento" class="w-full h-full object-cover">
             </div>
             <div class="flex-1 rounded-xl md:rounded-2xl overflow-hidden">
-              <img
-                :src="SECTION3_IMG2"
-                alt="Restauración dental"
-                class="w-full h-full object-cover"
-              >
+              <img :src="SECTION3_IMG2" alt="Restauración" class="w-full h-full object-cover">
             </div>
           </div>
 
@@ -250,77 +237,37 @@ useHead({
             :style="s3Reveal.getAnimStyle(2)"
           >
             <div>
-              <p class="text-xs md:text-sm font-semibold text-black mb-2 md:mb-3">
-                Consultoría
-              </p>
+              <p class="text-xs md:text-sm font-semibold text-black mb-2 md:mb-3 uppercase">Consultoría</p>
               <h3 class="text-xl md:text-3xl font-bold text-black leading-6 md:leading-8 uppercase">
                 Servicios de<br>Restauración<br>Dental
               </h3>
             </div>
-            <NuxtLink
-              to="/login"
-              class="px-5 py-3 md:px-8 md:py-5 bg-white rounded-full text-black text-base md:text-xl font-bold hover:scale-105 transition-transform"
-            >
+            <NuxtLink to="/login" class="px-5 py-3 md:px-8 md:py-5 bg-white rounded-full text-black text-base md:text-xl font-bold hover:scale-105 transition-transform">
               Reservar Cita
             </NuxtLink>
           </div>
         </div>
 
-        <!-- RIGHT COLUMN -->
         <div
           class="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[350px] md:min-h-0"
           :style="s3Reveal.getAnimStyle(3)"
         >
-          <img
-            :src="SECTION3_BG"
-            alt="Paciente sonriendo"
-            class="w-full h-full object-cover"
-          >
+          <img :src="SECTION3_BG" alt="Paciente" class="w-full h-full object-cover">
           <div class="absolute bottom-3 left-3 right-3 md:bottom-5 md:left-5 md:right-5 flex gap-1.5 md:gap-2">
-            <!-- Overlay Card 1 -->
             <div class="flex-1 bg-white rounded-xl md:rounded-2xl p-3 md:p-5 flex flex-col justify-between h-36 md:h-52">
               <h4 class="text-lg md:text-2xl font-bold text-black leading-5 md:leading-7 uppercase">
                 El Proceso de<br>Instalación de<br>Implantes
               </h4>
               <div class="self-end w-9 h-9 md:w-12 md:h-12 rounded-full border border-black flex items-center justify-center">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  class="rotate-[-45deg]"
-                >
-                  <path
-                    d="M1 7h12m0 0L8 2m5 5L8 12"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="rotate-[-45deg]"><path d="M1 7h12m0 0L8 2m5 5L8 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
               </div>
             </div>
-            <!-- Overlay Card 2 -->
             <div class="flex-1 bg-white/20 backdrop-blur-xl rounded-xl md:rounded-2xl p-3 md:p-5 flex flex-col justify-between h-36 md:h-52">
               <h4 class="text-lg md:text-2xl font-bold text-white leading-5 md:leading-7 uppercase">
                 Cuidados para<br>tus Implantes<br>Dentales
               </h4>
               <div class="self-end w-9 h-9 md:w-12 md:h-12 rounded-full border border-white flex items-center justify-center text-white">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  class="rotate-[-45deg]"
-                >
-                  <path
-                    d="M1 7h12m0 0L8 2m5 5L8 12"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="rotate-[-45deg]"><path d="M1 7h12m0 0L8 2m5 5L8 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
               </div>
             </div>
           </div>
@@ -329,3 +276,12 @@ useHead({
     </section>
   </div>
 </template>
+
+<style scoped>
+@import url('https://db.onlinewebfonts.com/c/1cd1e7d71e048159076fd90b39846902?family=Open+Sauce+One');
+@import url('https://db.onlinewebfonts.com/c/42acf9aa4a6dc2f2886a3f682e337ead?family=Open+Sauce+One+Bold');
+
+:deep(h1), :deep(h2), :deep(h3), :deep(h4), :deep(span) {
+  font-family: 'Open Sauce One', sans-serif;
+}
+</style>
