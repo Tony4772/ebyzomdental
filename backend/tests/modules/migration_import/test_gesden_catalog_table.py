@@ -1,8 +1,8 @@
-"""Lookup tables for Gesdén ``IdTipoODG`` → DentalPin signals.
+"""Lookup tables for Gesdén ``IdTipoODG`` → EBYZOM Dental signals.
 
 Locks in the contract: every documented IdTipoODG resolves, the
 infer-on-create signals (clinical_type, scope, surfaces) point at real
-DentalPin enums, and the alias expansion handles the most common
+EBYZOM Dental enums, and the alias expansion handles the most common
 Gesdén abbreviations the importer sees in the field.
 """
 

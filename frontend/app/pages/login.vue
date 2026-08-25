@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { PERMISSIONS } from '~/config/permissions'
+
 definePageMeta({
   layout: 'guest'
 })
@@ -6,6 +8,7 @@ definePageMeta({
 const { t } = useI18n()
 const auth = useAuth()
 const toast = useToast()
+const { can } = usePermissions()
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -82,7 +85,11 @@ async function onSubmit() {
       color: 'success'
     })
 
-    await navigateTo('/')
+    // Platform operators land on clinic provisioning, not the clinic dashboard.
+    const home = can(PERMISSIONS.platform.clinicsProvision)
+      ? '/settings/platform/clinics'
+      : '/'
+    await navigateTo(home)
   } catch (error: unknown) {
     console.error('Login error:', error)
     errorMessage.value = mapError(error)

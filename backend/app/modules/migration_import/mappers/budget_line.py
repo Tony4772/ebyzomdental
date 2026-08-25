@@ -143,7 +143,7 @@ class BudgetLineMapper:
             discount_type = None
             discount_value = None
 
-        # DPMF lines may resolve to several teeth (e.g. bridges). DentalPin's
+        # DPMF lines may resolve to several teeth (e.g. bridges). EBYZOM Dental's
         # BudgetItem.tooth_number is scalar, so we record the first decoded
         # FDI here and surface the full list in ``notes`` so the operator
         # can split the line afterwards if needed.

@@ -1,5 +1,5 @@
 <!--
-PR template for DentalPin. The checklist enforces conventions documented
+PR template for EBYZOM Dental. The checklist enforces conventions documented
 in CLAUDE.md and docs/checklists/. Tick boxes that apply; strike through
 the rest. Reviewers: don't approve while a relevant box is unchecked.
 -->

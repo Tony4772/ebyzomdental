@@ -2,7 +2,7 @@
 
 DPMF's ``applied_treatment`` row is the clinical event: a patient
 underwent (or is scheduled to undergo) a specific catalog entry. In
-DentalPin this requires three rows in cooperation:
+EBYZOM Dental this requires three rows in cooperation:
 
 1. **One ``TreatmentPlan`` per (patient, source budget)**. Gesdén
    organises clinical activity around budgets; piling 100+ items
@@ -84,23 +84,23 @@ _SHADOW_WINDOW_DAYS = 365 * 2
 # definition already-accepted historical records — leaving them in
 # ``draft`` would force the operator to confirm each one manually
 # before any consumer (budget, payments, reports) treats them as
-# real. ``active`` is the post-acceptance state in DentalPin's plan
+# real. ``active`` is the post-acceptance state in EBYZOM Dental's plan
 # machine and is the right migration target.
 _MIGRATED_PLAN_STATUS = "active"
 
 # Catch-all clinical_type for source rows whose ``IdTipoOdg`` doesn't
-# map to a known DentalPin treatment vocabulary entry. Visible in
+# map to a known EBYZOM Dental treatment vocabulary entry. Visible in
 # warnings so the operator can backfill the mapping.
 _FALLBACK_CLINICAL_TYPE = "migrated"
 
-# Gesdén ``IdTipoOdg`` → DentalPin ``TreatmentType`` resolution lives
+# Gesdén ``IdTipoOdg`` → EBYZOM Dental ``TreatmentType`` resolution lives
 # in :mod:`._gesden_catalog` and is shared with the catalog template
 # mapper so the two stay in sync over the 46-value ``TTipoOdg`` master.
 # Use :func:`clinical_type_for_tipo_odg` — returns ``None`` for
 # non-clinical entries (Higiene, Panorámica, Anotación, …) which this
 # mapper treats as the catch-all ``"migrated"``.
 
-# Once a treatment is realised, its DentalPin ``clinical_type`` often
+# Once a treatment is realised, its EBYZOM Dental ``clinical_type`` often
 # implies an observable artefact on the tooth (missing, crown,
 # implant…). Without this mapping the imported odontogram looks
 # uniformly ``healthy`` even for patients with decades of restorative
@@ -298,7 +298,7 @@ class AppliedTreatmentMapper:
         #   (Anotación, Nota Económica, Higiene, Panorámica, …).
         # - The row carries *no* recognisable clinical signal:
         #   ``IdTto`` is null **and** ``IdTipoOdg`` doesn't resolve to a
-        #   DentalPin ``clinical_type``. These are the free-text rows
+        #   EBYZOM Dental ``clinical_type``. These are the free-text rows
         #   that would otherwise land as ``clinical_type='migrated'``
         #   (the catch-all) with a blank label. Rows with a known
         #   clinical IdTipoOdg (filling, crown, extraction…) but no
@@ -381,7 +381,7 @@ class AppliedTreatmentMapper:
                 ctx,
                 source_id,
                 "applied_treatment.unmapped_tipo_odg",
-                f"IdTipoOdg={id_tipo_odg} sin equivalente clínico en DentalPin; "
+                f"IdTipoOdg={id_tipo_odg} sin equivalente clínico en EBYZOM Dental; "
                 f"se ha registrado como '{_FALLBACK_CLINICAL_TYPE}'.",
             )
 
@@ -438,7 +438,7 @@ class AppliedTreatmentMapper:
                 )
 
         # When the heuristic says "done" but Gesdén has no end date,
-        # use FecIni as an approximation so DentalPin's reports have
+        # use FecIni as an approximation so EBYZOM Dental's reports have
         # a date to anchor on.
         if is_realised and end_dt is None and not formal_done:
             end_dt = start_dt
@@ -831,7 +831,7 @@ class AppliedTreatmentMapper:
 
         Re-runs are safe — an existing row is reused. New rows land
         with ``general_condition='healthy'`` and an empty ``surfaces``
-        map; subsequent clinical activity in DentalPin overlays state
+        map; subsequent clinical activity in EBYZOM Dental overlays state
         on top.
         """
         key = (ctx.clinic_id, patient_id, tooth_number)

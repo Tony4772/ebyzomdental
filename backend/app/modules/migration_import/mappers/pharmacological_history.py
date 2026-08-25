@@ -2,7 +2,7 @@
 
 Gesdén's ``TTratamientos`` row records a drug the patient is taking,
 which dental-bridge exports as ``CanonicalPharmacologicalHistory``.
-DentalPin keeps these on the patient profile under
+EBYZOM Dental keeps these on the patient profile under
 :class:`patients_clinical.Medication`. Without this mapper the rows
 fell into ``RawEntity`` audit-only — the patient's clinical sidebar
 opened blank even when the source had a full medication list.

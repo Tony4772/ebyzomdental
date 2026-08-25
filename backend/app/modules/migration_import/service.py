@@ -191,7 +191,7 @@ class ImportJobService:
     ) -> PreviewResponse:
         """Read entity counts, sample rows, warnings, _files summary.
 
-        Reads the DPMF in read-only mode; no DentalPin rows are created.
+        Reads the DPMF in read-only mode; no EBYZOM Dental rows are created.
         """
         if job.status not in {"validated", "previewing", "completed"}:
             raise ValueError(f"job {job.id} cannot be previewed from status {job.status}")
@@ -722,7 +722,7 @@ class ImportJobService:
         Why: Gesdén's ``TColabos.IdTipoColab`` is often blank, and many
         clinics drive the agenda through ``TUsuAgd`` columns whose
         canonical professional rows carry no role hint. dental-bridge
-        therefore emits ``role=other`` for those users, which DentalPin
+        therefore emits ``role=other`` for those users, which EBYZOM Dental
         maps to ``assistant``. The agenda's ``/professionals`` endpoint
         only returns ``dentist``/``hygienist`` memberships — assistants
         disappear from the dropdown — so the migrated appointments

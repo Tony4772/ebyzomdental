@@ -28,7 +28,7 @@ class MappingResolver:
     """Read / write the ``entity_mappings`` table.
 
     All FK resolution between DPMF entities goes through this object —
-    mappers never use canonical UUIDs directly as DentalPin row IDs.
+    mappers never use canonical UUIDs directly as EBYZOM Dental row IDs.
 
     Memoisation is per-instance (one resolver per job), bounded by the
     number of distinct entity_type+canonical_uuid pairs in the file.
@@ -54,7 +54,7 @@ class MappingResolver:
         self._cache_warm: bool = False
 
     async def get(self, entity_type: str, canonical_uuid: str) -> UUID | None:
-        """Return the DentalPin row id mapped to ``(entity_type, canonical_uuid)``.
+        """Return the EBYZOM Dental row id mapped to ``(entity_type, canonical_uuid)``.
 
         Scoped to ``clinic_id`` so two clinics importing the same DPMF
         do not see each other's resolutions.

@@ -71,7 +71,7 @@ class FiscalDocumentMapper:
         from app.modules.billing.models import Invoice
 
         # The source's ``series`` is a free-text legal series ("F", "FR",
-        # "A"…) that DentalPin models as a UUID FK to ``InvoiceSeries``.
+        # "A"…) that EBYZOM Dental models as a UUID FK to ``InvoiceSeries``.
         # Building the InvoiceSeries catalog from a historical import is
         # out of scope, so we stamp the source series into
         # ``invoice_number`` (prefix preserves the legal chain visually)

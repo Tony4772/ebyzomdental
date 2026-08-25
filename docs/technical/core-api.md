@@ -1,6 +1,6 @@
-# DentalPin Core API
+# EBYZOM Dental Core API
 
-Public contract that DentalPin modules (official + community) can rely
+Public contract that EBYZOM Dental modules (official + community) can rely
 on. Everything in this document is covered by the deprecation policy
 in §7 — change-without-notice is a bug.
 
@@ -67,7 +67,7 @@ MANIFEST = {
 
     # Metadata — recommended
     "summary": "Invoices + payments",
-    "author": "DentalPin Core Team",
+    "author": "EBYZOM Dental Core Team",
     "license": "BSL-1.1",
 
     # Trust tier — required
@@ -284,7 +284,7 @@ All routes under `/api/v1/modules`.
 
 ## 10. Deprecation policy
 
-Until DentalPin v1.0 is tagged:
+Until EBYZOM Dental v1.0 is tagged:
 
 - Breaking changes can land with an announcement in the CHANGELOG.
 

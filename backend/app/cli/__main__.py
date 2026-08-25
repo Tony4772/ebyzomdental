@@ -12,7 +12,7 @@ from . import modules as modules_cli
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="dentalpin",
-        description="DentalPin admin CLI. Run inside the backend container.",
+        description="EBYZOM Dental admin CLI. Run inside the backend container.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 

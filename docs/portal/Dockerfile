@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.6
 #
-# Multi-stage build for the DentalPin documentation portal.
+# Multi-stage build for the EBYZOM Dental documentation portal.
 #
 # Build context MUST be the repository root (or at minimum the `docs/`
 # folder), because VitePress' `srcDir` is configured as `..` — pointing one

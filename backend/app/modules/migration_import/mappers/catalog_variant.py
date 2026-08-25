@@ -2,9 +2,9 @@
 
 DPMF carries per-tariff variants of a treatment template
 (``treatment_catalog_variant``) referencing the master template via
-``treatment_uuid``. DentalPin's catalog has a single offering per
+``treatment_uuid``. EBYZOM Dental's catalog has a single offering per
 treatment (no tariff axis), so we don't create new catalog rows here —
-instead we resolve the variant's canonical UUID to the SAME DentalPin
+instead we resolve the variant's canonical UUID to the SAME EBYZOM Dental
 ``TreatmentCatalogItem`` that its parent ``treatment_uuid`` already
 maps to.
 

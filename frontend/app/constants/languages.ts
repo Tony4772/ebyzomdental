@@ -1,6 +1,9 @@
+/** Product default UI + communication locale. */
+export const DEFAULT_LOCALE = 'es' as const
+
 export const SUPPORTED_LOCALES = [
-  'en',
   'es',
+  'en',
   'fr',
   'pt',
   'ta'

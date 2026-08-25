@@ -2,7 +2,7 @@
 
 Field mapping from `CanonicalAppointment` (DPMF v0.1):
 
-| DPMF                | DentalPin                                |
+| DPMF                | EBYZOM Dental                                |
 |---------------------|------------------------------------------|
 | patient_uuid        | patient_id (via resolver)                |
 | professional_uuid   | professional_id (via resolver)           |

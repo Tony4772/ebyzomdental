@@ -71,7 +71,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(
-    title="DentalPin API",
+    title="EBYZOM Dental API",
     description="Open source dental clinic management software",
     version="2.0.0",
     lifespan=lifespan,
@@ -83,7 +83,7 @@ app = FastAPI(
 async def root():
     return {
         "status": "ok",
-        "service": "DentalPin API"
+        "service": "EBYZOM Dental API"
     }
 # Configure rate limiter
 app.state.limiter = limiter
@@ -243,7 +243,7 @@ async def readiness_check(
 async def api_root() -> dict:
     """API root endpoint."""
     return {
-        "message": "DentalPin API",
+        "message": "EBYZOM Dental API",
         "version": "2.0.0",
         "docs": "/docs" if settings.ENVIRONMENT == "development" else None,
     }

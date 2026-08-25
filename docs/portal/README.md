@@ -1,4 +1,4 @@
-# DentalPin documentation portal
+# EBYZOM Dental documentation portal
 
 VitePress site that renders `/docs` as a public documentation portal at
 `docs.dentalpin.com`.

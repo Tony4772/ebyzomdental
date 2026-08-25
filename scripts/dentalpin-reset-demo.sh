@@ -40,7 +40,7 @@ GRANT ALL ON SCHEMA public TO dental;
 GRANT ALL ON SCHEMA public TO public;
 SQL
 
-# `heads` (plural) is required: DentalPin uses one Alembic branch per
+# `heads` (plural) is required: EBYZOM Dental uses one Alembic branch per
 # module, so `alembic upgrade head` errors out with "Multiple head
 # revisions are present" and — combined with `set -e` — aborts the
 # script before Step 3 can restart the backend, leaving the running

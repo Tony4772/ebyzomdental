@@ -27,7 +27,7 @@ Behaviour:
 - ``is_active`` mirrors the source's ``deactivated`` flag.
 - Always ensure a ``ClinicMembership(role='receptionist')`` exists.
   The receptionist role is the minimum non-clinical role in
-  DentalPin's RBAC matrix (``backend/app/core/auth/permissions.py``);
+  EBYZOM Dental's RBAC matrix (``backend/app/core/auth/permissions.py``);
   the admin can promote individual users to ``admin`` later from the
   Users page.
 """

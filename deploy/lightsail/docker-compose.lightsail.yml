@@ -20,14 +20,13 @@ services:
       start_period: 30s
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    image: ebyzomdental-backend:local
+    image: 104573823944.dkr.ecr.us-east-1.amazonaws.com/ebyzomdental-backend:latest
     container_name: ebyzomdental-backend
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-ebyzomdental}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-ebyzomdental_clinic}
+      # Use container_name, not service name — cae_default already has
+      # other services named ``db`` (cae/sazon) and DNS would collide.
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-ebyzomdental}:${POSTGRES_PASSWORD}@ebyzomdental-db:5432/${POSTGRES_DB:-ebyzomdental_clinic}
       SECRET_KEY: ${SECRET_KEY}
       BUDGET_PUBLIC_SECRET_KEY: ${BUDGET_PUBLIC_SECRET_KEY:-}
       ENVIRONMENT: production
@@ -49,12 +48,7 @@ services:
       - "8000"
 
   frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile.prod
-      args:
-        API_BASE_URL: ${PUBLIC_URL:-https://dental.ebyzom.com}
-    image: ebyzomdental-frontend:local
+    image: 104573823944.dkr.ecr.us-east-1.amazonaws.com/ebyzomdental-frontend:latest
     container_name: ebyzomdental-frontend
     restart: unless-stopped
     environment:

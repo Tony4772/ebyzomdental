@@ -134,6 +134,7 @@ async def setup(
         tax_id=data.clinic_tax_id,
         timezone=data.timezone or "Europe/Madrid",
         currency=data.currency or "EUR",
+        settings={"communication_language": "es"},
     )
     db.add(clinic)
     await db.flush()
@@ -224,6 +225,7 @@ async def provision_clinic(
         tax_id=data.clinic_tax_id,
         timezone=data.timezone or "Europe/Madrid",
         currency=data.currency or "EUR",
+        settings={"communication_language": "es"},
     )
     db.add(clinic)
     await db.flush()

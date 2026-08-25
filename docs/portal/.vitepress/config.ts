@@ -19,7 +19,7 @@ const VUE_DIR = fileURLToPath(new URL("../node_modules/vue", import.meta.url));
 // existing markdown is rendered without copies. The portal folder itself
 // is excluded so VitePress does not try to render its own scaffolding.
 export default defineConfig({
-  title: "DentalPin Docs",
+  title: "EBYZOM Dental Docs",
   description:
     "Open-source dental clinic management software — developer reference and user manual.",
   lang: "en-US",

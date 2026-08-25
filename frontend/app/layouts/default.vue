@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { PERMISSIONS } from '~/config/permissions'
+
 const { t } = useI18n()
 const auth = useAuth()
 const clinic = useClinic()
@@ -6,6 +8,8 @@ const { navigationItems, ensureLoaded } = useModules()
 const { init: initDensity } = useDensity()
 const { isTablet } = useBreakpoint()
 const route = useRoute()
+const { can } = usePermissions()
+const isPlatformOperator = computed(() => can(PERMISSIONS.platform.clinicsProvision))
 
 // Pull the backend-driven nav on mount + on every route change, so
 // sidebar reflects module installs/upgrades without a full reload.
@@ -72,6 +76,9 @@ function isActive(to: string): boolean {
   if (to === '/') {
     return route.path === '/'
   }
+  if (to === '/settings/platform/clinics') {
+    return route.path.startsWith('/settings/platform')
+  }
   if (route.path === to) {
     return true
   }
@@ -99,7 +106,7 @@ function isActive(to: string): boolean {
         <NuxtLink
           to="/"
           class="flex items-center gap-2 overflow-hidden"
-          aria-label="DentalPin"
+          aria-label="EBYZOM Dental"
         >
           <img
             src="/logo-icon.svg"
@@ -112,13 +119,34 @@ function isActive(to: string): boolean {
             v-if="!isSidebarCollapsed"
             class="text-h2 text-default truncate"
           >
-            DentalPin
+            EBYZOM Dental
           </span>
         </NuxtLink>
       </div>
 
       <!-- Navigation -->
       <nav class="flex-1 px-2 py-2 space-y-1 overflow-y-auto">
+        <NuxtLink
+          v-if="isPlatformOperator"
+          to="/settings/platform/clinics"
+          class="group flex items-center gap-3 px-3 py-2 rounded-token-md text-ui transition-colors"
+          :class="[
+            isActive('/settings/platform/clinics')
+              ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary-soft-text)]'
+              : 'text-muted hover:bg-surface hover:text-default'
+          ]"
+        >
+          <UIcon
+            name="i-lucide-building-2"
+            class="w-[18px] h-[18px] shrink-0"
+          />
+          <span
+            v-if="!isSidebarCollapsed"
+            class="truncate"
+          >
+            {{ t('nav.platformClinics') }}
+          </span>
+        </NuxtLink>
         <NuxtLink
           v-for="item in mainNavItems"
           :key="item.to"
@@ -201,7 +229,7 @@ function isActive(to: string): boolean {
             <NuxtLink
               to="/"
               class="flex items-center gap-2 overflow-hidden"
-              aria-label="DentalPin"
+              aria-label="EBYZOM Dental"
               @click="mobileNavOpen = false"
             >
               <img
@@ -211,7 +239,7 @@ function isActive(to: string): boolean {
                 height="32"
                 class="shrink-0"
               >
-              <span class="text-h2 text-default truncate">DentalPin</span>
+              <span class="text-h2 text-default truncate">EBYZOM Dental</span>
             </NuxtLink>
             <UButton
               variant="ghost"
@@ -226,6 +254,23 @@ function isActive(to: string): boolean {
           <!-- Navigation -->
           <nav class="flex-1 px-2 py-2 space-y-1 overflow-y-auto">
             <NuxtLink
+              v-if="isPlatformOperator"
+              to="/settings/platform/clinics"
+              class="group flex items-center gap-3 px-3 py-3 rounded-token-md text-ui transition-colors"
+              :class="[
+                isActive('/settings/platform/clinics')
+                  ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary-soft-text)]'
+                  : 'text-muted hover:bg-surface hover:text-default'
+              ]"
+              @click="mobileNavOpen = false"
+            >
+              <UIcon
+                name="i-lucide-building-2"
+                class="w-5 h-5 shrink-0"
+              />
+              <span class="truncate">{{ t('nav.platformClinics') }}</span>
+            </NuxtLink>
+            <NuxtLink
               v-for="item in mainNavItems"
               :key="item.to"
               :to="item.to"
@@ -235,6 +280,7 @@ function isActive(to: string): boolean {
                   ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary-soft-text)]'
                   : 'text-muted hover:bg-surface hover:text-default'
               ]"
+              @click="mobileNavOpen = false"
             >
               <UIcon
                 :name="item.icon"

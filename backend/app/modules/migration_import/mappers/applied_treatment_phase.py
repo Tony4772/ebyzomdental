@@ -112,7 +112,7 @@ class AppliedTreatmentPhaseMapper:
         executed_dt = _parse_datetime(payload.get("executed_on"))
 
         # We don't yet split the parent treatment's amount across phases
-        # — DentalPin sessions carry absolute amounts and we lack the
+        # — EBYZOM Dental sessions carry absolute amounts and we lack the
         # canonical price split. Leave amount at zero and surface the
         # source percent in the label for visibility.
         label_parts: list[str] = []

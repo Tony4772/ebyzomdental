@@ -5,7 +5,7 @@
 set -e
 
 echo "============================================================"
-echo "DentalPin Full Demo Setup"
+echo "EBYZOM Dental Full Demo Setup"
 echo "============================================================"
 echo ""
 

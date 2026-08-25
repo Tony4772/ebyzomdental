@@ -12,7 +12,7 @@ The inactive flag is reserved for users an admin has explicitly
 disabled — not for "needs password reset".
 
 Email collisions across clinics resolve to the existing User —
-DentalPin's User table is global, ClinicMembership is per-clinic.
+EBYZOM Dental's User table is global, ClinicMembership is per-clinic.
 
 Soft filtering (``ctx.professional_filters``): rows that match any of
 the four operator-enabled signals (source-marked inactive, agenda-orphan,
@@ -38,8 +38,8 @@ from ..models import ImportWarning
 from .base import MapperContext, ProfessionalFilterOptions
 
 # Map DPMF's canonical `role` string (see dental-bridge's
-# ``ProfessionalRole`` StrEnum) into DentalPin's membership role values.
-# The source enum emits ``doctor`` — DentalPin calls the same role
+# ``ProfessionalRole`` StrEnum) into EBYZOM Dental's membership role values.
+# The source enum emits ``doctor`` — EBYZOM Dental calls the same role
 # ``dentist``. Anything unrecognised falls back to "assistant" so the
 # user can do something useful while the admin re-roles.
 _ROLE_MAP: dict[str, str] = {

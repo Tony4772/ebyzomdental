@@ -75,7 +75,7 @@ class Settings(BaseSettings):
 
     # Default sender
     EMAIL_FROM_ADDRESS: str = "noreply@dentalpin.com"
-    EMAIL_FROM_NAME: str = "DentalPin"
+    EMAIL_FROM_NAME: str = "EBYZOM Dental"
 
     # Copilot / agentic layer (app/core/llm/). OpenAI is the only live
     # provider in v1; per-clinic `copilot_settings` overrides provider +

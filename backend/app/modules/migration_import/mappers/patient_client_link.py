@@ -3,7 +3,7 @@
 In Gesdén ``DCobros`` (payments) reference a *client* (``IdCli``), not
 the patient directly. Clinics use Clients as payers — the same client
 may pay for several patients (family accounts) or one patient may have
-multiple billing clients (insurance + self-pay). DentalPin's flat
+multiple billing clients (insurance + self-pay). EBYZOM Dental's flat
 ``Payment.patient_id`` model needs a single patient per payment.
 
 This mapper bridges the M:N. For every ``(patient_uuid, client_uuid)``

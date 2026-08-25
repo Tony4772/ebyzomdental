@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Seed script to populate DentalPin with demo data.
+"""Seed script to populate EBYZOM Dental with demo data.
 
 Creates the full clinical narrative for a demo clinic:
     patients → treatment plans → (budgets + appointments) → invoices
@@ -598,7 +598,7 @@ async def seed_invoices(db: AsyncSession, catalog_map: dict, budgets_result: dic
 def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Seed DentalPin with demo data",
+        description="Seed EBYZOM Dental with demo data",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -626,7 +626,7 @@ async def main(lang: str = "en") -> None:
     lang_name = lang_names.get(lang, lang)
 
     print("\n" + "=" * 60)
-    print(f"DentalPin Demo Data Seeder ({lang_name})")
+    print(f"EBYZOM Dental Demo Data Seeder ({lang_name})")
     print("=" * 60 + "\n")
 
     async with async_session_maker() as db:

@@ -107,6 +107,14 @@ export interface GettingStartedItem extends GettingStartedRule {
 
 const DEFAULT_CATEGORIES: readonly SettingsCategory[] = [
   {
+    id: 'platform',
+    labelKey: 'settings.categories.platform.label',
+    descriptionKey: 'settings.categories.platform.description',
+    icon: 'i-lucide-shield',
+    order: 5,
+    permission: 'platform.clinics.provision'
+  },
+  {
     id: 'general',
     labelKey: 'settings.categories.general.label',
     descriptionKey: 'settings.categories.general.description',
@@ -163,14 +171,6 @@ const DEFAULT_CATEGORIES: readonly SettingsCategory[] = [
     icon: 'i-lucide-blocks',
     order: 80,
     permission: 'admin.clinic.read'
-  },
-  {
-    id: 'platform',
-    labelKey: 'settings.categories.platform.label',
-    descriptionKey: 'settings.categories.platform.description',
-    icon: 'i-lucide-shield',
-    order: 85,
-    permission: 'platform.clinics.provision'
   },
   {
     id: 'account',

@@ -1,1 +1,1 @@
-# DentalPin Backend
+# EBYZOM Dental Backend

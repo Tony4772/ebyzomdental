@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "DentalPin",
+    "name": "EBYZOM Dental",
     "tagline": "பல் மருத்துவமனை மேலாண்மை"
   },
   "demo": {
@@ -63,7 +63,7 @@
     "next": "அடுத்து",
     "back": "பின்",
     "submit": "உருவாக்கி தொடங்கு",
-    "success": "அனைத்தும் தயார்! DentalPin-க்கு வரவேற்கிறோம்",
+    "success": "அனைத்தும் தயார்! EBYZOM Dental-க்கு வரவேற்கிறோம்",
     "firstNameRequired": "முதல் பெயரை உள்ளிடவும்",
     "lastNameRequired": "கடைசி பெயரை உள்ளிடவும்",
     "emailRequired": "மின்னஞ்சலை உள்ளிடவும்",
@@ -890,7 +890,7 @@
       "afternoon": "மதிய வணக்கம்",
       "evening": "மாலை வணக்கம்"
     },
-    "welcome": "DentalPin-க்கு வரவேற்கிறோம்",
+    "welcome": "EBYZOM Dental-க்கு வரவேற்கிறோம்",
     "welcomeMessage": "உங்கள் முதல் நோயாளியை உருவாக்குவதன் மூலம் தொடங்குங்கள்.",
     "quickActions": {
       "newAppointment": "புதிய சந்திப்பு",

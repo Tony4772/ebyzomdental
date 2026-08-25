@@ -108,7 +108,7 @@ class ImportJob(Base, TimestampMixin):
 
 
 class EntityMapping(Base, TimestampMixin):
-    """`(source_system, canonical_uuid, entity_type)` → DentalPin row.
+    """`(source_system, canonical_uuid, entity_type)` → EBYZOM Dental row.
 
     The idempotency keystone. Every mapper consults this first; if the
     triple is already present for the job's clinic, the mapper returns
@@ -301,7 +301,7 @@ class MappingDecision(Base, TimestampMixin):
 class RawEntity(Base, TimestampMixin):
     """Catch-all for DPMF entities without a dedicated mapper today.
 
-    Forward-compat hatch: the day a target module appears in DentalPin
+    Forward-compat hatch: the day a target module appears in EBYZOM Dental
     we can rehydrate from these rows instead of asking the operator to
     re-import the file.
     """

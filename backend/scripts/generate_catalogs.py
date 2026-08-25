@@ -225,7 +225,7 @@ def _render_modules_catalog(modules, publishers) -> str:
         GENERATED_HEADER,
         "# Modules catalog\n",
         "Single source of truth for every module loaded into the running "
-        "DentalPin instance. Generated from module manifests, "
+        "EBYZOM Dental instance. Generated from module manifests, "
         "`get_permissions()`, `get_event_handlers()`, and grep of "
         "`event_bus.publish` callsites.\n",
         "Maintained by `backend/scripts/generate_catalogs.py`. CI fails "
