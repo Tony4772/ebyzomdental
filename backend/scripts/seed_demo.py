@@ -211,6 +211,9 @@ async def seed_users(db: AsyncSession, password_hash: str) -> list[User]:
             professional_id=user_data.get("professional_id"),
             is_active=True,
             token_version=0,
+            # Demo admin is also the instance operator so the showcase
+            # can provision extra clinics without a separate account.
+            is_platform_operator=user_data["role"] == "admin",
         )
         db.add(user)
         users.append(user)

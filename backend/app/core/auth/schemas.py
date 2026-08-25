@@ -51,6 +51,7 @@ class UserResponse(BaseModel):
     last_name: str
     professional_id: str | None = None
     is_active: bool
+    is_platform_operator: bool = False
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -234,3 +235,44 @@ class SystemSetup(BaseModel):
     @classmethod
     def validate_timezone(cls, value: str | None) -> str | None:
         return _validate_iana_timezone(value)
+
+
+# --- Platform operator: provision clinics for customers ---------------
+
+
+class ClinicProvisionRequest(BaseModel):
+    """Create a new clinic + its first admin (platform operator only)."""
+
+    clinic_name: str = Field(min_length=1, max_length=200)
+    clinic_tax_id: str = Field(min_length=1, max_length=20)
+    timezone: str | None = Field(default=None, max_length=64)
+    currency: str | None = Field(default=None, pattern="^[A-Z]{3}$")
+    admin_first_name: str = Field(min_length=1, max_length=100)
+    admin_last_name: str = Field(min_length=1, max_length=100)
+    admin_email: EmailStr
+    admin_password: str = Field(min_length=8)
+
+    @field_validator("timezone")
+    @classmethod
+    def validate_timezone(cls, value: str | None) -> str | None:
+        return _validate_iana_timezone(value)
+
+
+class PlatformClinicSummary(BaseModel):
+    """Clinic row for the platform operator list."""
+
+    id: UUID
+    name: str
+    tax_id: str
+    timezone: str
+    currency: str
+    created_at: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ClinicProvisionResponse(BaseModel):
+    """Result of provisioning a clinic for a customer."""
+
+    clinic: PlatformClinicSummary
+    admin: UserResponse

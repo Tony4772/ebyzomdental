@@ -25,6 +25,7 @@ export type SettingsCategoryId
     | 'communications'
     | 'integrations'
     | 'modules'
+    | 'platform'
     | 'account'
 
 export interface SettingsCategory {
@@ -162,6 +163,14 @@ const DEFAULT_CATEGORIES: readonly SettingsCategory[] = [
     icon: 'i-lucide-blocks',
     order: 80,
     permission: 'admin.clinic.read'
+  },
+  {
+    id: 'platform',
+    labelKey: 'settings.categories.platform.label',
+    descriptionKey: 'settings.categories.platform.description',
+    icon: 'i-lucide-shield',
+    order: 85,
+    permission: 'platform.clinics.provision'
   },
   {
     id: 'account',

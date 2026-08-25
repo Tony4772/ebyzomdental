@@ -151,3 +151,19 @@ def require_permission(permission: str) -> Callable:
             )
 
     return permission_checker
+
+
+async def require_platform_operator(
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> User:
+    """Require the caller to be a platform operator (instance owner).
+
+    Gated by ``User.is_platform_operator``, not clinic RBAC — clinic
+    admins hold ``*`` and must not inherit provisioning power.
+    """
+    if not current_user.is_platform_operator:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Platform operator access required",
+        )
+    return current_user

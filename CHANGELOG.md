@@ -8,6 +8,15 @@ uses [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Platform operator clinic provisioning.** Instance owners
+  (`User.is_platform_operator`) can create a new clinic + first admin
+  from **Settings → Platform → Clinics** when a customer contracts the
+  service. Gated by flag (not clinic-admin ``*``), so a regular clinic
+  admin cannot provision tenants. First-run setup and the demo admin
+  are marked as operators; migration ``0007`` backfills the earliest
+  user on existing installs. APIs:
+  ``GET/POST /api/v1/auth/platform/clinics``.
+
 - **Modern Landing Page** — A new, high-impact landing page at the root (`/`) URL featuring a splash screen with a counter, three-section design with "Masked Card" visual effects (shared background image across multiple cards), and staggered scroll animations.
 - **New Dashboard Route** — The clinic management dashboard has been moved to `/dashboard` to make room for the public landing page. Authenticated users are automatically redirected to the dashboard upon login.
 - **Custom Composables for UI Effects** — Added `useMaskPositions`, `useImageWidth`, and `useStaggeredReveal` to power the landing page's advanced visual transitions.

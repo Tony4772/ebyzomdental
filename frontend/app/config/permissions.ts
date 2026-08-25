@@ -94,6 +94,9 @@ export const PERMISSIONS = {
     clinicRead: 'admin.clinic.read',
     clinicWrite: 'admin.clinic.write'
   },
+  platform: {
+    clinicsProvision: 'platform.clinics.provision'
+  },
   migrationImport: {
     jobRead: 'migration_import.job.read',
     jobWrite: 'migration_import.job.write',

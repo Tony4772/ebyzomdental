@@ -44,6 +44,11 @@ CORE_PERMISSIONS: Final[list[str]] = [
     "agents.manage",
 ]
 
+# Platform-level capability. Injected into ``/me`` only when
+# ``User.is_platform_operator`` is true — deliberately NOT listed in
+# ``CORE_PERMISSIONS`` so clinic-admin ``*`` never expands to it.
+PLATFORM_CLINICS_PROVISION: Final[str] = "platform.clinics.provision"
+
 # Role -> core-permission grants. Module-namespaced perms are NOT here;
 # they live in each module's ``manifest.role_permissions`` and are
 # merged in by ``get_role_permissions``.

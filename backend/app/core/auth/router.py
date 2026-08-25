@@ -17,10 +17,17 @@ from app.core.plugins import module_registry
 from app.core.schemas import ApiResponse, PaginatedApiResponse
 from app.database import get_db
 
-from .dependencies import ClinicContext, get_clinic_context, get_current_user, require_permission
+from .dependencies import (
+    ClinicContext,
+    get_clinic_context,
+    get_current_user,
+    require_permission,
+    require_platform_operator,
+)
 from .models import Clinic, ClinicMembership, User
 from .permissions import (
     CORE_PERMISSIONS,
+    PLATFORM_CLINICS_PROVISION,
     PROFESSIONAL_ROLES,
     ROLES,
     expand_permissions,
@@ -30,8 +37,11 @@ from .schemas import (
     AuthResponse,
     ClinicMetadataResponse,
     ClinicMetadataUpdate,
+    ClinicProvisionRequest,
+    ClinicProvisionResponse,
     ClinicResponse,
     MeResponse,
+    PlatformClinicSummary,
     ProfessionalResponse,
     SetupStatusResponse,
     SystemSetup,
@@ -133,6 +143,7 @@ async def setup(
         password_hash=hash_password(data.admin_password),
         first_name=data.admin_first_name,
         last_name=data.admin_last_name,
+        is_platform_operator=True,
     )
     db.add(user)
     await db.flush()
@@ -146,6 +157,105 @@ async def setup(
     refresh_token = create_refresh_token(user.id, token_version=user.token_version)
 
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+@router.get(
+    "/platform/clinics",
+    response_model=PaginatedApiResponse[PlatformClinicSummary],
+)
+async def list_platform_clinics(
+    _: Annotated[User, Depends(require_platform_operator)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> PaginatedApiResponse[PlatformClinicSummary]:
+    """List every clinic on this instance (platform operator only)."""
+    result = await db.execute(select(Clinic).order_by(Clinic.created_at.asc()))
+    clinics = result.scalars().all()
+    items = [
+        PlatformClinicSummary(
+            id=c.id,
+            name=c.name,
+            tax_id=c.tax_id,
+            timezone=c.timezone,
+            currency=c.currency,
+            created_at=c.created_at.isoformat() if c.created_at else "",
+        )
+        for c in clinics
+    ]
+    return PaginatedApiResponse(
+        data=items,
+        total=len(items),
+        page=1,
+        page_size=len(items),
+    )
+
+
+@router.post(
+    "/platform/clinics",
+    response_model=ApiResponse[ClinicProvisionResponse],
+    status_code=status.HTTP_201_CREATED,
+)
+@limiter.limit("20/hour")
+async def provision_clinic(
+    request: Request,
+    data: ClinicProvisionRequest,
+    _: Annotated[User, Depends(require_platform_operator)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> ApiResponse[ClinicProvisionResponse]:
+    """Provision a clinic + admin for a contracting customer.
+
+    The new admin is a normal clinic admin (not a platform operator).
+    """
+    is_valid, error_msg = validate_password_strength(data.admin_password)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=error_msg,
+        )
+
+    existing = await db.execute(select(User).where(User.email == data.admin_email))
+    if existing.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already registered",
+        )
+
+    clinic = Clinic(
+        name=data.clinic_name,
+        tax_id=data.clinic_tax_id,
+        timezone=data.timezone or "Europe/Madrid",
+        currency=data.currency or "EUR",
+    )
+    db.add(clinic)
+    await db.flush()
+
+    admin = User(
+        email=data.admin_email,
+        password_hash=hash_password(data.admin_password),
+        first_name=data.admin_first_name,
+        last_name=data.admin_last_name,
+        is_platform_operator=False,
+    )
+    db.add(admin)
+    await db.flush()
+
+    db.add(ClinicMembership(user_id=admin.id, clinic_id=clinic.id, role="admin"))
+    await db.commit()
+    await db.refresh(clinic)
+    await db.refresh(admin)
+
+    return ApiResponse(
+        data=ClinicProvisionResponse(
+            clinic=PlatformClinicSummary(
+                id=clinic.id,
+                name=clinic.name,
+                tax_id=clinic.tax_id,
+                timezone=clinic.timezone,
+                currency=clinic.currency,
+                created_at=clinic.created_at.isoformat() if clinic.created_at else "",
+            ),
+            admin=UserResponse.model_validate(admin),
+        )
+    )
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -308,6 +418,11 @@ async def get_me(
         # Combine module permissions with core permissions
         all_perms = module_registry.get_all_permissions() + CORE_PERMISSIONS
         permissions = expand_permissions(role_perms, all_perms)
+
+    # Platform capability is flag-gated, not role-expanded (clinic
+    # admin ``*`` must never inherit it).
+    if current_user.is_platform_operator and PLATFORM_CLINICS_PROVISION not in permissions:
+        permissions = [*permissions, PLATFORM_CLINICS_PROVISION]
 
     return ApiResponse(
         data=MeResponse(

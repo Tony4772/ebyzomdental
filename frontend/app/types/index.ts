@@ -8,6 +8,7 @@ export interface User {
   last_name: string
   professional_id?: string
   is_active: boolean
+  is_platform_operator?: boolean
   created_at: string
   updated_at: string
 }

@@ -65,6 +65,9 @@ class User(Base, TimestampMixin):
     professional_id: Mapped[str | None] = mapped_column(String(50))  # Colegiado number
     is_active: Mapped[bool] = mapped_column(default=True)
     token_version: Mapped[int] = mapped_column(default=0)  # For token revocation
+    # Instance owner — can provision clinics for customers. Not a clinic
+    # role: clinic admins hold ``*`` and must not inherit this power.
+    is_platform_operator: Mapped[bool] = mapped_column(default=False)
 
     # Relationships
     memberships: Mapped[list["ClinicMembership"]] = relationship(

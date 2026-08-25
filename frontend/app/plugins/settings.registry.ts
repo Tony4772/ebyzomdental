@@ -110,6 +110,22 @@ export default defineNuxtPlugin(() => {
     order: 10
   })
 
+  // ---- Platform (instance owner) ------------------------------------
+  registerSettingsPage({
+    path: 'clinics',
+    category: 'platform',
+    labelKey: 'settings.platform.title',
+    descriptionKey: 'settings.platform.description',
+    icon: 'i-lucide-building-2',
+    permission: 'platform.clinics.provision',
+    component: () => import('~/components/settings/pages/PlatformClinicsPage.vue'),
+    searchKeywords: [
+      'plataforma', 'platform', 'provision', 'nueva clinica', 'new clinic',
+      'operador', 'operator', 'contratar', 'tenant'
+    ],
+    order: 10
+  })
+
   // ---- Account -------------------------------------------------------
   registerSettingsPage({
     path: 'profile',
