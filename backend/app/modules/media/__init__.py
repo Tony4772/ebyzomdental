@@ -33,14 +33,10 @@ class MediaModule(BaseModule):
         "removable": False,
         "role_permissions": {
             "admin": ["*"],
-            "dentist": ["*"],
-            "hygienist": [
-                "documents.read",
-                "attachments.read",
-                "attachments.write",
-            ],
-            "assistant": ["*"],
-            "receptionist": ["*"],
+            "dentist": ["documents.read", "documents.write", "attachments.read", "attachments.write"],
+            "hygienist": ["documents.read", "attachments.read", "attachments.write"],
+            "assistant": ["documents.read"],
+            "receptionist": ["documents.read"],
         },
         "frontend": {
             "layer_path": "frontend",

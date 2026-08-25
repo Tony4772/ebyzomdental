@@ -29,9 +29,9 @@ class PatientsModule(BaseModule):
         "removable": False,
         "role_permissions": {
             "admin": ["*"],
-            "dentist": ["*"],
+            "dentist": ["patients.read", "patients.write"],
             "hygienist": ["read"],
-            "assistant": ["*"],
+            "assistant": ["patients.read", "patients.write"],
             "receptionist": ["read", "write"],
         },
         "frontend": {

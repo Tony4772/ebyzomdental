@@ -32,11 +32,11 @@ class BillingModule(BaseModule):
         "installable": True,
         "auto_install": True,
         "removable": False,
-        "role_permissions": {
+"role_permissions": {
             "admin": ["*"],
-            "dentist": ["*"],
-            "hygienist": ["read"],
-            "assistant": ["read", "write"],
+            "dentist": ["read", "write", "admin"],
+            "hygienist": [],
+            "assistant": [],
             "receptionist": ["read", "write"],
         },
         "frontend": {

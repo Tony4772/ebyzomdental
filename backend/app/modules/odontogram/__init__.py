@@ -26,12 +26,12 @@ class OdontogramModule(BaseModule):
         "installable": True,
         "auto_install": True,
         "removable": False,
-        "role_permissions": {
+"role_permissions": {
             "admin": ["*"],
-            "dentist": ["*"],
-            "hygienist": ["read", "write"],
-            "assistant": ["read"],
-            "receptionist": [],
+            "dentist": ["odontogram.read", "odontogram.write", "treatments.read", "treatments.write"],
+            "hygienist": ["read"],
+            "assistant": [],
+            "receptionist": ["read"],
         },
         "frontend": {
             "layer_path": "frontend",

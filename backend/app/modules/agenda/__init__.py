@@ -30,22 +30,10 @@ class AgendaModule(BaseModule):
         "removable": False,
         "role_permissions": {
             "admin": ["*"],
-            "dentist": ["*"],
-            "hygienist": [
-                "appointments.read",
-                "appointments.write",
-                "cabinets.read",
-            ],
-            "assistant": [
-                "appointments.read",
-                "appointments.write",
-                "cabinets.read",
-            ],
-            "receptionist": [
-                "appointments.read",
-                "appointments.write",
-                "cabinets.read",
-            ],
+            "dentist": ["appointments.read", "appointments.write", "cabinets.read", "cabinets.write"],
+            "hygienist": ["appointments.read", "appointments.write", "cabinets.read"],
+            "assistant": ["appointments.read", "appointments.write", "cabinets.read"],
+            "receptionist": ["appointments.read", "appointments.write", "cabinets.read"],
         },
         "frontend": {
             "layer_path": "frontend",

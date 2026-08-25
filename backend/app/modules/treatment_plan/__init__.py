@@ -53,22 +53,10 @@ class TreatmentPlanModule(BaseModule):
         "removable": False,
         "role_permissions": {
             "admin": ["*"],
-            "dentist": ["*"],
+            "dentist": ["plans.read", "plans.write", "plans.confirm", "plans.close", "plans.reactivate"],
             "hygienist": ["plans.read"],
-            "assistant": [
-                "plans.read",
-                "plans.write",
-            ],
-            # Reception drives the bandeja de planes: read + write notes
-            # + close (terminal transitions tied to patient outcomes) +
-            # reactivate (welcoming a returning patient back to draft).
-            # Confirm stays with the doctor.
-            "receptionist": [
-                "plans.read",
-                "plans.write",
-                "plans.close",
-                "plans.reactivate",
-            ],
+            "assistant": ["plans.read", "plans.write"],
+            "receptionist": ["plans.read", "plans.write", "plans.close", "plans.reactivate"],
         },
         "frontend": {
             "layer_path": "frontend",
