@@ -1,0 +1,86 @@
+# EBYZOM dental on Lightsail cae-platform (joins cae_default for Caddy).
+# Domain: dental.ebyzom.com — TLS via cae-caddy.
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: ebyzomdental-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ebyzomdental_clinic}
+      POSTGRES_USER: ${POSTGRES_USER:-ebyzomdental}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ebyzomdental_pgdata:/var/lib/postgresql/data
+    networks:
+      - cae_default
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ebyzomdental} -d ${POSTGRES_DB:-ebyzomdental_clinic}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    image: ${EBYZOM_BACKEND_IMAGE:-ebyzomdental-backend:local}
+    container_name: ebyzomdental-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-ebyzomdental}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-ebyzomdental_clinic}
+      SECRET_KEY: ${SECRET_KEY}
+      BUDGET_PUBLIC_SECRET_KEY: ${BUDGET_PUBLIC_SECRET_KEY:-}
+      ENVIRONMENT: production
+      ALLOWED_ORIGINS: ${PUBLIC_URL:-https://dental.ebyzom.com}
+      STORAGE_BACKEND: local
+      STORAGE_LOCAL_PATH: /app/storage
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      SEED_ON_STARTUP: ${SEED_ON_STARTUP:-0}
+      SEED_LANG: ${SEED_LANG:-es}
+    volumes:
+      - ebyzomdental_storage:/app/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - cae_default
+    mem_limit: 512m
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health', timeout=2).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  frontend:
+    image: ${EBYZOM_FRONTEND_IMAGE:-ebyzomdental-frontend:local}
+    container_name: ebyzomdental-frontend
+    restart: unless-stopped
+    environment:
+      NUXT_PUBLIC_API_BASE_URL: ${PUBLIC_URL:-https://dental.ebyzom.com}
+      API_BASE_URL_SERVER: http://backend:8000
+      NUXT_PUBLIC_DOCS_URL: ${DOCS_URL:-https://docs.ebyzomdental.com}
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - cae_default
+    mem_limit: 384m
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+networks:
+  cae_default:
+    external: true
+
+volumes:
+  ebyzomdental_pgdata:
+  ebyzomdental_storage:
