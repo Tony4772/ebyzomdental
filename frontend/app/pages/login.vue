@@ -20,7 +20,7 @@ const siteOrigin = computed(() => {
   return 'https://dental.ebyzom.com'
 })
 
-const ogImage = computed(() => `${siteOrigin.value}/og-image.png?v=2`)
+const ogImage = computed(() => `${siteOrigin.value}/og-image.png?v=3`)
 
 useSeoMeta({
   title: () => t('seo.title'),
