@@ -25,14 +25,14 @@ useSeoMeta({
   description: () => t('seo.description'),
   ogTitle: () => t('seo.title'),
   ogDescription: () => t('seo.description'),
-  ogImage: 'https://dental.ebyzom.com/og-image.png',
+  ogImage: 'https://dental.ebyzom.com/og-image.png?v=2',
   ogImageAlt: () => t('seo.ogImageAlt'),
   ogType: 'website',
   ogSiteName: 'EBYZOM Dental',
   twitterCard: 'summary_large_image',
   twitterTitle: () => t('seo.title'),
   twitterDescription: () => t('seo.description'),
-  twitterImage: 'https://dental.ebyzom.com/og-image.png'
+  twitterImage: 'https://dental.ebyzom.com/og-image.png?v=2'
 })
 </script>
 

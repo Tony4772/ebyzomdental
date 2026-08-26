@@ -61,6 +61,7 @@
     "editTitle": "Editar clínica",
     "editSaved": "Clínica actualizada",
     "editError": "No se pudo guardar los cambios",
+    "editValidationHint": "Revisa los campos marcados e inténtalo de nuevo",
     "deleteTitle": "Eliminar clínica",
     "deleteConfirm": "¿Eliminar «{clinic}»? Sus usuarios no podrán entrar. Los datos fiscales se conservan y podrás reactivarla después.",
     "timezone": "Zona horaria",

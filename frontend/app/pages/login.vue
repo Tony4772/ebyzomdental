@@ -20,7 +20,7 @@ const siteOrigin = computed(() => {
   return 'https://dental.ebyzom.com'
 })
 
-const ogImage = computed(() => `${siteOrigin.value}/og-image.png`)
+const ogImage = computed(() => `${siteOrigin.value}/og-image.png?v=2`)
 
 useSeoMeta({
   title: () => t('seo.title'),
@@ -165,13 +165,13 @@ watch(() => formState.password, () => {
     <!-- Right: login form -->
     <section class="flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-14 xl:px-20">
       <!-- Mobile hero strip -->
-      <div class="lg:hidden mb-6 -mx-6 -mt-10 sm:-mx-10">
+      <div class="lg:hidden mb-6 -mx-6 -mt-10 sm:-mx-10 bg-[var(--color-primary)]/5">
         <img
-          src="/login-hero.png"
+          src="/og-image.png"
           :alt="t('seo.ogImageAlt')"
-          class="w-full h-40 object-cover object-center"
-          width="800"
-          height="320"
+          class="w-full h-auto max-h-44 object-contain object-center"
+          width="1200"
+          height="630"
         >
       </div>
 

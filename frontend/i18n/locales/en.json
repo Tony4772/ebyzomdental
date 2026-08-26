@@ -61,6 +61,7 @@
     "editTitle": "Edit clinic",
     "editSaved": "Clinic updated",
     "editError": "Could not save changes",
+    "editValidationHint": "Check the highlighted fields and try again",
     "deleteTitle": "Delete clinic",
     "deleteConfirm": "Delete “{clinic}”? Its users will lose access. Fiscal data is kept and you can reactivate it later.",
     "timezone": "Timezone",

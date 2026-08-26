@@ -64,12 +64,12 @@ export default defineNuxtConfig({
           property: 'og:description',
           content: 'Sistema de gestión para clínicas dentales. Agenda, pacientes, presupuestos y facturación.'
         },
-        { property: 'og:image', content: 'https://dental.ebyzom.com/og-image.png' },
+        { property: 'og:image', content: 'https://dental.ebyzom.com/og-image.png?v=2' },
         { property: 'og:image:width', content: '1200' },
-        { property: 'og:image:height', content: '1200' },
+        { property: 'og:image:height', content: '630' },
         { property: 'og:locale', content: 'es_PE' },
         { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:image', content: 'https://dental.ebyzom.com/og-image.png' }
+        { name: 'twitter:image', content: 'https://dental.ebyzom.com/og-image.png?v=2' }
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }

@@ -265,18 +265,39 @@ async function refreshFeePreview() {
   }
 }
 
+function formatApiDetail(err: unknown): string {
+  const detail = (err as { data?: { detail?: unknown } }).data?.detail
+  if (typeof detail === 'string' && detail.trim()) return detail
+  if (Array.isArray(detail)) {
+    const msgs = detail
+      .map((item) => {
+        if (typeof item === 'string') return item
+        if (item && typeof item === 'object' && 'msg' in item) {
+          return String((item as { msg: unknown }).msg)
+        }
+        return ''
+      })
+      .filter(Boolean)
+    if (msgs.length) return msgs.join(' · ')
+  }
+  return t('platform.editError')
+}
+
 async function onSaveEdit() {
   if (!editing.value) return
   editError.value = ''
-  if (!validateEdit()) return
+  if (!validateEdit()) {
+    editError.value = t('platform.editValidationHint')
+    return
+  }
 
   isSavingEdit.value = true
   try {
     const payload: Record<string, string | number> = {
       name: editForm.name.trim(),
       tax_id: editForm.taxId.trim(),
-      timezone: editForm.timezone,
-      currency: editForm.currency
+      timezone: String(editForm.timezone || 'America/Lima').trim(),
+      currency: String(editForm.currency || 'PEN').trim().toUpperCase()
     }
     const raw = priceText()
     const solesNum = Number(raw.replace(',', '.'))
@@ -295,8 +316,7 @@ async function onSaveEdit() {
     showEdit.value = false
     toast.add({ title: t('platform.editSaved'), color: 'success' })
   } catch (err: unknown) {
-    const detail = (err as { data?: { detail?: string } }).data?.detail
-    editError.value = detail ? String(detail) : t('platform.editError')
+    editError.value = formatApiDetail(err)
   } finally {
     isSavingEdit.value = false
   }
@@ -606,11 +626,11 @@ onMounted(() => {
             {{ t('common.cancel') }}
           </UButton>
           <UButton
-            type="submit"
-            form="platform-create-clinic"
+            type="button"
             color="primary"
             :loading="isCreating"
             :disabled="isCreating"
+            @click="onSubmit"
           >
             {{ t('settings.platform.submit') }}
           </UButton>
@@ -752,11 +772,11 @@ onMounted(() => {
             {{ t('common.cancel') }}
           </UButton>
           <UButton
-            type="submit"
-            form="platform-edit-clinic"
+            type="button"
             color="primary"
             :loading="isSavingEdit"
             :disabled="isSavingEdit"
+            @click="onSaveEdit"
           >
             {{ t('common.save') }}
           </UButton>
