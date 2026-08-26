@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- fix(security): bounded upload reads + magic-byte MIME sniffing (audit
+  2026-08). ``upload_document`` / ``upload_photo`` no longer call
+  ``file.read()`` unbounded — ``read_upload_bounded`` aborts as soon as
+  ``STORAGE_MAX_FILE_SIZE`` is exceeded (also rejects absurd multipart
+  bodies via ``Content-Length`` with a 1 MiB form-overhead budget, and
+  honours ``UploadFile.size`` when Starlette exposes it). Stored MIME
+  comes from sniffed magic bytes, not the client ``Content-Type``, so an
+  executable cannot be uploaded as ``image/jpeg`` / ``application/pdf``.
+
 - fix(events): repair the `patient.archived` cascade, which had never
   run (audit event-bus #1, #95). The handler signature took
   `(self, db, data)` but the bus calls `handler(data)`, raising

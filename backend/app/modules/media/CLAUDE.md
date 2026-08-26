@@ -81,9 +81,15 @@ through `attachment_registry`.
   untouched. The download endpoint accepts a `variant` query param.
 - **EXIF capture timestamp** is extracted server-side via Pillow in
   `exif.py`. Manual override via `PATCH /documents/{id}/photo-metadata`.
-- **MIME validation is mandatory** — see `validation.py`. The photo
-  path extends the base allowlist with `image/heic|heif|webp|gif` so
-  iOS uploads work without per-clinic config changes.
+- **MIME validation is mandatory** — see `validation.py`. Uploads are
+  sniffed via magic bytes (PDF / JPEG / PNG / GIF / WebP / HEIC); the
+  client `Content-Type` is cross-checked but never trusted alone. The
+  photo path extends the base allowlist with `image/heic|heif|webp|gif`
+  so iOS uploads work without per-clinic config changes.
+- **Upload size is bounded while reading** — `read_upload_bounded`
+  aborts as soon as `STORAGE_MAX_FILE_SIZE` is exceeded (and rejects
+  early on `Content-Length` when present). Do not call `file.read()`
+  unbounded in new upload endpoints.
 - **Files must be scoped by `clinic_id`** in the storage layout.
 - **`media_attachments.owner_type` has no CHECK constraint** by design
   — see ADR 0007. Validation lives in `attachment_registry`.

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix(scheduler): clinic listing in ``expire_budgets`` /
+  ``send_budget_reminders`` filtered on non-existent ``deleted_at``
+  (audit 2026-08). Clinics use ``status`` — query is now
+  ``WHERE status != 'deleted'`` so the cron no longer raises
+  ``UndefinedColumn`` every run.
+
 - fix(workflow): plan ↔ budget lifecycle desync (issue #162).
   `cancel_budget` now publishes `budget.cancelled` (with `plan_id`) so a
   directly-cancelled quote reopens its pending plan instead of leaving it

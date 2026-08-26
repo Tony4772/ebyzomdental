@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix(scheduler): ``auto_close_expired_plans`` listed clinics with
+  ``WHERE deleted_at IS NULL`` but ``clinics`` has no such column
+  (audit 2026-08). Filter is now ``status != 'deleted'``.
+
 - i18n: add `ta` fallback to plan item name resolution in service
   layer so Tamil-localized treatment names display correctly.
   

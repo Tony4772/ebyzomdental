@@ -130,7 +130,26 @@ async def test_upload_invalid_mime_type(
     assert response.status_code == 400
     body = response.json()
     # HTTPException returns detail field
-    assert "not allowed" in body.get("detail", body.get("message", ""))
+    assert "not allowed" in body.get("detail", body.get("message", "")) or "Unrecognized" in body.get(
+        "detail", ""
+    )
+
+
+@pytest.mark.asyncio
+async def test_upload_rejects_exe_disguised_as_pdf(
+    client: AsyncClient, auth_headers: dict[str, str], media_setup: dict
+) -> None:
+    """Magic-byte sniff must reject an executable claiming to be a PDF."""
+    patient_id = media_setup["patient_id"]
+    response = await client.post(
+        f"/api/v1/media/patients/{patient_id}/documents",
+        headers=auth_headers,
+        files={"file": ("malware.pdf", BytesIO(b"MZ\x90\x00fake"), "application/pdf")},
+        data={"document_type": "other", "title": "Spoofed"},
+    )
+    assert response.status_code == 400
+    detail = response.json().get("detail", "")
+    assert "match" in detail or "Unrecognized" in detail
 
 
 @pytest.mark.asyncio

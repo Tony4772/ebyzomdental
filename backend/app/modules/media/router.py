@@ -11,6 +11,7 @@ from fastapi import (
     Form,
     HTTPException,
     Query,
+    Request,
     Response,
     UploadFile,
     status,
@@ -34,12 +35,24 @@ from .service import AttachmentService, DocumentService, PhotoService
 from .thumbnails import MEDIUM_SUFFIX, THUMB_SUFFIX, is_thumbnailable
 from .validation import (
     DOCUMENT_TYPES,
+    read_upload_bounded,
+    reject_oversized_multipart_body,
+    resolve_mime_type,
     validate_document_type,
-    validate_file_size,
-    validate_mime_type,
 )
 
 router = APIRouter()
+
+
+def _parse_content_length(request: Request) -> int | None:
+    """Parse ``Content-Length`` when present; ignore malformed values."""
+    raw = request.headers.get("content-length")
+    if raw is None:
+        return None
+    try:
+        return int(raw)
+    except ValueError:
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -76,6 +89,7 @@ def _decorate(doc) -> DocumentResponse:
 )
 async def upload_document(
     patient_id: UUID,
+    request: Request,
     file: Annotated[UploadFile, File()],
     document_type: Annotated[str, Form()],
     title: Annotated[str, Form(min_length=1, max_length=255)],
@@ -89,10 +103,9 @@ async def upload_document(
         raise HTTPException(status_code=404, detail="Patient not found")
 
     validate_document_type(document_type)
-    validate_file_size(file)
-    mime_type = validate_mime_type(file)
-
-    file_data = await file.read()
+    reject_oversized_multipart_body(_parse_content_length(request))
+    file_data = await read_upload_bounded(file)
+    mime_type = resolve_mime_type(file_data, declared=file.content_type)
 
     document = await DocumentService.create_document(
         db=db,
@@ -162,6 +175,7 @@ async def list_patient_documents(
 )
 async def upload_photo(
     patient_id: UUID,
+    request: Request,
     file: Annotated[UploadFile, File()],
     title: Annotated[str, Form(min_length=1, max_length=255)],
     media_kind: Annotated[str, Form()] = "photo",
@@ -184,9 +198,9 @@ async def upload_photo(
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
 
-    validate_file_size(file)
-    mime_type = validate_mime_type(file)
-    file_data = await file.read()
+    reject_oversized_multipart_body(_parse_content_length(request))
+    file_data = await read_upload_bounded(file)
+    mime_type = resolve_mime_type(file_data, declared=file.content_type)
 
     document = await DocumentService.create_document(
         db=db,
