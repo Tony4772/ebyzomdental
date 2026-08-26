@@ -98,9 +98,20 @@ export function useApi() {
       }
 
       if (fetchError.statusCode === 403) {
+        const detail = String(
+          (fetchError as { data?: { detail?: string } }).data?.detail || ''
+        )
+        if (/subscription is overdue/i.test(detail) && import.meta.client) {
+          const path = useRoute().path
+          if (!path.startsWith('/subscription')) {
+            await navigateTo('/subscription')
+          }
+        }
         toast.add({
           title: t('common.error'),
-          description: t('common.forbidden', 'Acceso denegado'),
+          description: /subscription is overdue/i.test(detail)
+            ? t('platform.subscription.access.overdue')
+            : t('common.forbidden', 'Acceso denegado'),
           color: 'error'
         })
         throw error

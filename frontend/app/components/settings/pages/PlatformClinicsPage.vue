@@ -15,6 +15,20 @@ interface PlatformClinic {
   currency: string
   status: ClinicStatus
   created_at: string
+  subscription_price_cents?: number | null
+  subscription_period_ends_at?: string | null
+  subscription_access_state?: string | null
+}
+
+interface FeePreview {
+  amount_cents: number
+  currency: string
+  culqi_fee_cents: number
+  sunat_igv_cents: number
+  net_cents: number
+  fee_percent: number
+  fee_fixed_cents: number
+  igv_percent: number
 }
 
 interface ProvisionResult {
@@ -62,15 +76,22 @@ const editForm = reactive({
   name: '',
   taxId: '',
   timezone: 'America/Lima',
-  currency: 'PEN'
+  currency: 'PEN',
+  priceSoles: ''
 })
 const editFieldErrors = reactive<Record<string, string>>({})
+const feePreview = ref<FeePreview | null>(null)
+const feeLoading = ref(false)
 
 const showDelete = ref(false)
 const isDeleting = ref(false)
 const deleting = ref<PlatformClinic | null>(null)
 
 const lastProvisioned = ref<ProvisionResult | null>(null)
+
+function soles(cents: number | null | undefined): string {
+  return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format((cents ?? 0) / 100)
+}
 
 function statusColor(status: ClinicStatus): 'success' | 'warning' | 'error' | 'neutral' {
   if (status === 'active') return 'success'
@@ -188,22 +209,60 @@ async function onSubmit() {
   }
 }
 
+function priceText(): string {
+  return String(editForm.priceSoles ?? '').trim()
+}
+
 function openEdit(clinic: PlatformClinic) {
   editing.value = clinic
   editForm.name = clinic.name
   editForm.taxId = clinic.tax_id
   editForm.timezone = clinic.timezone || 'America/Lima'
   editForm.currency = clinic.currency || 'PEN'
+  editForm.priceSoles = clinic.subscription_price_cents != null
+    ? (clinic.subscription_price_cents / 100).toFixed(2)
+    : ''
   editError.value = ''
+  feePreview.value = null
   for (const k of Object.keys(editFieldErrors)) editFieldErrors[k] = ''
   showEdit.value = true
+  void refreshFeePreview()
 }
 
 function validateEdit(): boolean {
   for (const k of Object.keys(editFieldErrors)) editFieldErrors[k] = ''
   if (!editForm.name.trim()) editFieldErrors.name = t('settings.platform.clinicNameRequired')
   if (!editForm.taxId.trim()) editFieldErrors.taxId = t('settings.platform.taxIdRequired')
+  const raw = priceText()
+  if (raw) {
+    const solesNum = Number(raw.replace(',', '.'))
+    if (!Number.isFinite(solesNum) || solesNum < 1) {
+      editFieldErrors.priceSoles = t('platform.subscription.priceInvalid')
+    }
+  }
   return Object.values(editFieldErrors).every(v => !v)
+}
+
+async function refreshFeePreview() {
+  const raw = priceText()
+  const solesNum = Number(raw.replace(',', '.'))
+  if (!raw || !Number.isFinite(solesNum) || solesNum < 1) {
+    feePreview.value = null
+    return
+  }
+  const amount_cents = Math.round(solesNum * 100)
+  feeLoading.value = true
+  try {
+    const res = await api.post<ApiResponse<FeePreview>>('/api/v1/subscriptions/preview-fees', {
+      amount_cents,
+      currency: editForm.currency || 'PEN'
+    })
+    feePreview.value = res.data
+  } catch {
+    feePreview.value = null
+  } finally {
+    feeLoading.value = false
+  }
 }
 
 async function onSaveEdit() {
@@ -213,14 +272,21 @@ async function onSaveEdit() {
 
   isSavingEdit.value = true
   try {
+    const payload: Record<string, string | number> = {
+      name: editForm.name.trim(),
+      tax_id: editForm.taxId.trim(),
+      timezone: editForm.timezone,
+      currency: editForm.currency
+    }
+    const raw = priceText()
+    const solesNum = Number(raw.replace(',', '.'))
+    if (raw && Number.isFinite(solesNum) && solesNum >= 1) {
+      payload.subscription_price_cents = Math.round(solesNum * 100)
+    }
+
     const res = await api.patch<ApiResponse<PlatformClinic>>(
       `/api/v1/auth/platform/clinics/${editing.value.id}`,
-      {
-        name: editForm.name.trim(),
-        tax_id: editForm.taxId.trim(),
-        timezone: editForm.timezone,
-        currency: editForm.currency
-      }
+      payload
     )
     const idx = clinics.value.findIndex(c => c.id === editing.value!.id)
     if (idx >= 0 && res.data) {
@@ -228,8 +294,9 @@ async function onSaveEdit() {
     }
     showEdit.value = false
     toast.add({ title: t('platform.editSaved'), color: 'success' })
-  } catch {
-    editError.value = t('platform.editError')
+  } catch (err: unknown) {
+    const detail = (err as { data?: { detail?: string } }).data?.detail
+    editError.value = detail ? String(detail) : t('platform.editError')
   } finally {
     isSavingEdit.value = false
   }
@@ -253,6 +320,10 @@ async function confirmDelete() {
     isDeleting.value = false
   }
 }
+
+watch(() => editForm.priceSoles, () => {
+  void refreshFeePreview()
+})
 
 onMounted(() => {
   fetchClinics()
@@ -338,6 +409,18 @@ onMounted(() => {
             </div>
             <p class="text-caption text-muted mt-0.5">
               {{ clinic.tax_id }} · {{ clinic.timezone }} · {{ clinic.currency }}
+            </p>
+            <p class="text-caption text-muted mt-0.5">
+              {{ t('platform.subscription.price') }}:
+              <span class="font-medium text-default">
+                {{ clinic.subscription_price_cents != null ? soles(clinic.subscription_price_cents) : '—' }}
+              </span>
+              <span
+                v-if="clinic.subscription_access_state"
+                class="text-subtle"
+              >
+                · {{ t(`platform.subscription.access.${clinic.subscription_access_state}`) }}
+              </span>
             </p>
             <p
               v-if="clinic.created_at"
@@ -535,11 +618,14 @@ onMounted(() => {
       </template>
     </UModal>
 
-    <!-- Edit clinic -->
+    <!-- Edit clinic (datos + precio suscripción con desglose Culqi/SUNAT) -->
     <UModal
       v-model:open="showEdit"
       :title="t('platform.editTitle')"
-      :ui="{ content: 'sm:max-w-lg' }"
+      :ui="{
+        content: 'max-h-[90vh] flex flex-col sm:max-w-lg',
+        body: 'overflow-y-auto'
+      }"
     >
       <template #body>
         <form
@@ -592,6 +678,66 @@ onMounted(() => {
               :disabled="isSavingEdit"
             />
           </UFormField>
+
+          <div class="border-t border-default pt-4 space-y-3">
+            <p class="text-caption font-medium text-default">
+              {{ t('platform.subscription.setPriceTitle') }}
+            </p>
+            <p class="text-caption text-muted">
+              {{ t('platform.subscription.setPriceHint') }}
+            </p>
+            <UFormField
+              :label="t('platform.subscription.priceSoles')"
+              :error="editFieldErrors.priceSoles || undefined"
+            >
+              <UInput
+                v-model="editForm.priceSoles"
+                type="text"
+                inputmode="decimal"
+                class="w-full"
+                :disabled="isSavingEdit"
+                placeholder="150.00"
+              />
+            </UFormField>
+
+            <div
+              v-if="feeLoading"
+              class="text-caption text-muted"
+            >
+              …
+            </div>
+            <div
+              v-else-if="feePreview"
+              class="rounded-token-md border border-default p-3 space-y-2 text-body"
+            >
+              <div class="flex justify-between gap-2">
+                <span class="text-muted">{{ t('platform.subscription.breakdownAmount') }}</span>
+                <span>{{ soles(feePreview.amount_cents) }}</span>
+              </div>
+              <div class="flex justify-between gap-2">
+                <span class="text-muted">
+                  {{ t('platform.subscription.breakdownCulqi', {
+                    percent: feePreview.fee_percent,
+                    fixed: soles(feePreview.fee_fixed_cents)
+                  }) }}
+                </span>
+                <span>{{ soles(feePreview.culqi_fee_cents) }}</span>
+              </div>
+              <div class="flex justify-between gap-2">
+                <span class="text-muted">
+                  {{ t('platform.subscription.breakdownSunat', { percent: feePreview.igv_percent }) }}
+                </span>
+                <span>{{ soles(feePreview.sunat_igv_cents) }}</span>
+              </div>
+              <div class="flex justify-between gap-2 font-medium border-t border-default pt-2">
+                <span>{{ t('platform.subscription.breakdownNet') }}</span>
+                <span class="text-success">{{ soles(feePreview.net_cents) }}</span>
+              </div>
+              <p class="text-caption text-subtle pt-1">
+                {{ t('platform.subscription.breakdownNote') }}
+              </p>
+            </div>
+          </div>
         </form>
       </template>
 

@@ -167,6 +167,8 @@ async def setup(
 
 
 def _platform_clinic_summary(clinic: Clinic) -> PlatformClinicSummary:
+    from app.core.subscriptions.service import subscription_access_state
+
     return PlatformClinicSummary(
         id=clinic.id,
         name=clinic.name,
@@ -175,6 +177,13 @@ def _platform_clinic_summary(clinic: Clinic) -> PlatformClinicSummary:
         currency=clinic.currency,
         status=clinic.status,
         created_at=clinic.created_at.isoformat() if clinic.created_at else "",
+        subscription_price_cents=clinic.subscription_price_cents,
+        subscription_period_ends_at=(
+            clinic.subscription_period_ends_at.isoformat()
+            if clinic.subscription_period_ends_at
+            else None
+        ),
+        subscription_access_state=subscription_access_state(clinic),
     )
 
 
@@ -297,6 +306,15 @@ async def update_platform_clinic(
         clinic.currency = updates["currency"]
     if "status" in updates and updates["status"] is not None:
         clinic.status = updates["status"]
+    if "subscription_price_cents" in updates and updates["subscription_price_cents"] is not None:
+        from app.core.subscriptions.service import SubscriptionService
+
+        await SubscriptionService.set_price(
+            db,
+            clinic,
+            updates["subscription_price_cents"],
+            start_trial=clinic.subscription_period_ends_at is None,
+        )
 
     await db.commit()
     await db.refresh(clinic)

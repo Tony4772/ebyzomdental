@@ -268,6 +268,9 @@ class PlatformClinicSummary(BaseModel):
     currency: str
     status: str
     created_at: str
+    subscription_price_cents: int | None = None
+    subscription_period_ends_at: str | None = None
+    subscription_access_state: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -283,6 +286,7 @@ class PlatformClinicUpdate(BaseModel):
         default=None,
         pattern="^(active|paused|blocked|deleted)$",
     )
+    subscription_price_cents: int | None = Field(default=None, ge=100, le=10_000_000)
 
     @field_validator("timezone")
     @classmethod

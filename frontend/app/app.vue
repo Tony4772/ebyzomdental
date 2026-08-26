@@ -21,8 +21,18 @@ useHead(() => ({
 }))
 
 useSeoMeta({
-  title: 'EBYZOM Dental',
-  description: t('app.tagline')
+  title: () => t('seo.title'),
+  description: () => t('seo.description'),
+  ogTitle: () => t('seo.title'),
+  ogDescription: () => t('seo.description'),
+  ogImage: 'https://dental.ebyzom.com/og-image.png',
+  ogImageAlt: () => t('seo.ogImageAlt'),
+  ogType: 'website',
+  ogSiteName: 'EBYZOM Dental',
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => t('seo.title'),
+  twitterDescription: () => t('seo.description'),
+  twitterImage: 'https://dental.ebyzom.com/og-image.png'
 })
 </script>
 

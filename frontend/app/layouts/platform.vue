@@ -12,6 +12,11 @@ const navItems = [
     to: '/platform/clinics',
     icon: 'i-lucide-building-2',
     labelKey: 'platform.nav.clinics'
+  },
+  {
+    to: '/platform/subscriptions',
+    icon: 'i-lucide-wallet',
+    labelKey: 'platform.nav.subscriptions'
   }
 ] as const
 

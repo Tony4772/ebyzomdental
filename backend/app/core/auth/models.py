@@ -1,9 +1,10 @@
 """Core authentication and authorization models."""
 
+from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
-from sqlalchemy import ForeignKey, String, text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -40,6 +41,12 @@ class Clinic(Base, TimestampMixin):
     # Platform lifecycle: active clinics operate normally; paused/blocked
     # reject clinic-scoped API access for their staff.
     status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="active")
+    # SaaS subscription (platform operator ↔ clinic owner agreement).
+    # Amount in minor units (céntimos). NULL = not priced yet.
+    subscription_price_cents: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    subscription_period_ends_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True, default=None
+    )
     settings: Mapped[dict] = mapped_column(JSONB, default=dict)
 
     # Relationships

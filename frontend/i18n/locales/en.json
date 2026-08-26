@@ -1,7 +1,12 @@
 {
   "app": {
     "name": "EBYZOM Dental",
-    "tagline": "Gestión de clinica dental"
+    "tagline": "Dental clinic management system"
+  },
+  "seo": {
+    "title": "EBYZOM Dental | Dental Clinic Management System",
+    "description": "EBYZOM Dental is the management system for dental clinics: scheduling, patients, quotes, collections and billing in one place.",
+    "ogImageAlt": "EBYZOM Dental — Dental Clinic Management System"
   },
   "demo": {
     "bannerMessage": "Public demo — do not enter real patient data. The database is reset periodically.",
@@ -35,7 +40,8 @@
     "panelTitle": "Customer clinics",
     "panelDescription": "Manage clinics that subscribe to EBYZOM Dental: create, edit, pause access, or remove them.",
     "nav": {
-      "clinics": "Clinics"
+      "clinics": "Clinics",
+      "subscriptions": "Subscriptions"
     },
     "status": {
       "active": "Active",
@@ -58,7 +64,53 @@
     "deleteTitle": "Delete clinic",
     "deleteConfirm": "Delete “{clinic}”? Its users will lose access. Fiscal data is kept and you can reactivate it later.",
     "timezone": "Timezone",
-    "currency": "Currency"
+    "currency": "Currency",
+    "subscription": {
+      "dashboardTitle": "Subscriptions & collections",
+      "dashboardDescription": "Subscription payments per clinic (Culqi). No fixed plans — each clinic has an agreed price.",
+      "loadError": "Could not load data",
+      "totalCollected": "Total collected",
+      "totalCulqi": "Culqi fees",
+      "totalSunat": "IGV (SUNAT)",
+      "totalNet": "Net to you",
+      "payments": "payments",
+      "byClinic": "By clinic",
+      "price": "Monthly price",
+      "net": "Net",
+      "periodEnds": "Ends",
+      "recent": "Recent payments",
+      "noPayments": "No payments yet",
+      "noPaymentsHint": "When a clinic pays its subscription, it will show up here.",
+      "setPrice": "Price",
+      "setPriceTitle": "Subscription price",
+      "setPriceHint": "Individual agreement with the clinic owner. Billed every 30 days (+ 5 grace days).",
+      "priceSoles": "Price (Soles)",
+      "priceInvalid": "Enter a valid amount (min S/ 1.00)",
+      "priceSaved": "Price saved",
+      "priceError": "Could not save price",
+      "breakdownAmount": "Charged to clinic",
+      "breakdownCulqi": "Culqi ({percent}% + ~USD 0.20 ≈ {fixed})",
+      "breakdownSunat": "SUNAT / IGV {percent}% of subscription (inclusive)",
+      "breakdownNet": "You keep (estimated net)",
+      "breakdownNote": "Culqi’s fee is IGV-exempt (official Culqi). The IGV shown is on your subscription sale if you invoice with inclusive IGV.",
+      "access": {
+        "ok": "Current",
+        "grace": "Grace period",
+        "overdue": "Overdue",
+        "unpriced": "No price",
+        "due": "Due soon"
+      },
+      "accessLabel": "Status",
+      "payTitle": "Pay subscription",
+      "payDescription": "Pay for EBYZOM Dental with card or Yape (Culqi).",
+      "payButton": "Pay now",
+      "payMethods": "Visa/Mastercard or Yape",
+      "paySuccess": "Payment recorded. Subscription renewed for 30 days.",
+      "payFailed": "Payment could not be completed",
+      "payNotConfigured": "Culqi is not configured or the clinic has no price.",
+      "graceHint": "After due date there are {days} grace days before access is suspended.",
+      "days": "days"
+    }
   },
   "auth": {
     "login": "Log in",
@@ -67,6 +119,7 @@
     "password": "Password",
     "loginButton": "Sign in",
     "loginSuccess": "Signed in successfully",
+    "whatsappContact": "Contact via WhatsApp {phone}",
     "invalidCredentials": "Incorrect email or password",
     "emailRequired": "Enter your email",
     "passwordRequired": "Enter your password",

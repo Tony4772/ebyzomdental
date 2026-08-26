@@ -87,6 +87,19 @@ class Settings(BaseSettings):
     COPILOT_MAX_TOKENS: int = 4096
     COPILOT_REDACTION_DEFAULT: bool = True
 
+    # Culqi (SaaS subscription payments — platform operator account)
+    CULQI_PUBLIC_KEY: str = ""
+    CULQI_SECRET_KEY: str = ""
+    CULQI_API_BASE: str = "https://api.culqi.com/v2"
+    # CulqiOnline national / Yape: 3.44% + USD 0.20 (comisión inafecta a IGV).
+    # Fixed fee stored in PEN céntimos as an estimate of USD 0.20 (~S/ 0.75).
+    CULQI_FEE_PERCENT: float = 3.44
+    CULQI_FEE_FIXED_CENTS: int = 75
+    # IGV on the *subscription sale* (price includes IGV). Not applied on Culqi fee.
+    CULQI_IGV_PERCENT: float = 18.0
+    SUBSCRIPTION_PERIOD_DAYS: int = 30
+    SUBSCRIPTION_GRACE_DAYS: int = 5
+
     @property
     def allowed_origins_list(self) -> list[str]:
         """Parse ALLOWED_ORIGINS as comma-separated list."""

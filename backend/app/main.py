@@ -191,6 +191,11 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
 # Mount auth router
 app.include_router(auth_router, prefix="/api/v1")
 
+# Platform SaaS subscriptions (Culqi)
+from app.core.subscriptions.router import router as subscriptions_router  # noqa: E402
+
+app.include_router(subscriptions_router, prefix="/api/v1")
+
 # Mount module management router (install/uninstall/upgrade/restart).
 from app.core.plugins.router import router as modules_router  # noqa: E402
 

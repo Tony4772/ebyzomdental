@@ -131,6 +131,11 @@ async def get_clinic_context(
 
     assert_clinic_access(current_user, membership.clinic)
 
+    if not current_user.is_platform_operator:
+        from app.core.subscriptions.service import assert_subscription_allows_access
+
+        assert_subscription_allows_access(membership.clinic)
+
     # Bind clinic_id + user_id onto the per-request logging context so
     # every log line and event emitted inside this handler carries
     # them automatically (request_id was set by the middleware). Not
@@ -142,6 +147,59 @@ async def get_clinic_context(
         clinic=membership.clinic,
         role=membership.role,
     )
+
+
+async def get_clinic_context_for_billing(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    clinic_id: UUID | None = None,
+) -> ClinicContext:
+    """Clinic context for subscription payment routes.
+
+    Allows access when the clinic is overdue or paused for an unpaid
+    subscription so the admin can still pay via Culqi.
+    """
+    from app.core.auth.models import Clinic as ClinicModel
+
+    result = await db.execute(
+        select(ClinicMembership)
+        .options(selectinload(ClinicMembership.clinic).selectinload(ClinicModel.cabinets))
+        .where(ClinicMembership.user_id == current_user.id)
+    )
+    memberships = result.scalars().all()
+    if not memberships:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is not a member of any clinic",
+        )
+
+    if clinic_id:
+        membership = next((m for m in memberships if m.clinic_id == clinic_id), None)
+        if not membership:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User does not have access to this clinic",
+            )
+    else:
+        membership = memberships[0]
+
+    clinic = membership.clinic
+    if not current_user.is_platform_operator:
+        if clinic.status in ("blocked", "deleted"):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Clinic access is suspended",
+            )
+        if clinic.status == "paused" and not (clinic.settings or {}).get(
+            "paused_for_subscription"
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Clinic access is suspended",
+            )
+
+    set_request_context(clinic_id=clinic.id, user_id=current_user.id)
+    return ClinicContext(user=current_user, clinic=clinic, role=membership.role)
 
 
 def require_permission(permission: str) -> Callable:
