@@ -1,11 +1,24 @@
 <script setup lang="ts">
+import { PERMISSIONS } from '~/config/permissions'
+
 const { t } = useI18n()
 const auth = useAuth()
 const clinic = useClinic()
+const { can } = usePermissions()
 const { navigationItems, ensureLoaded } = useModules()
 const { init: initDensity } = useDensity()
 const { isTablet } = useBreakpoint()
 const route = useRoute()
+
+/** Clinic admin pays SaaS subscription — must be visible in the clinic UI. */
+const subscriptionNavItem = computed(() => {
+  if (!can(PERMISSIONS.users.write)) return null
+  return {
+    to: '/subscription',
+    icon: 'i-lucide-credit-card',
+    label: t('nav.subscription')
+  }
+})
 
 // Pull the backend-driven nav on mount + on every route change, so
 // sidebar reflects module installs/upgrades without a full reload.
@@ -147,6 +160,28 @@ function isActive(to: string): boolean {
             {{ item.label }}
           </span>
         </NuxtLink>
+
+        <NuxtLink
+          v-if="subscriptionNavItem"
+          :to="subscriptionNavItem.to"
+          class="group flex items-center gap-3 px-3 py-2 rounded-token-md text-ui transition-colors"
+          :class="[
+            isActive(subscriptionNavItem.to)
+              ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary-soft-text)]'
+              : 'text-muted hover:bg-surface hover:text-default'
+          ]"
+        >
+          <UIcon
+            :name="subscriptionNavItem.icon"
+            class="w-[18px] h-[18px] shrink-0"
+          />
+          <span
+            v-if="!isSidebarCollapsed"
+            class="truncate"
+          >
+            {{ subscriptionNavItem.label }}
+          </span>
+        </NuxtLink>
       </nav>
 
       <!-- User section -->
@@ -247,6 +282,24 @@ function isActive(to: string): boolean {
                 class="w-5 h-5 shrink-0"
               />
               <span class="truncate">{{ item.label }}</span>
+            </NuxtLink>
+
+            <NuxtLink
+              v-if="subscriptionNavItem"
+              :to="subscriptionNavItem.to"
+              class="group flex items-center gap-3 px-3 py-3 rounded-token-md text-ui transition-colors"
+              :class="[
+                isActive(subscriptionNavItem.to)
+                  ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary-soft-text)]'
+                  : 'text-muted hover:bg-surface hover:text-default'
+              ]"
+              @click="mobileNavOpen = false"
+            >
+              <UIcon
+                :name="subscriptionNavItem.icon"
+                class="w-5 h-5 shrink-0"
+              />
+              <span class="truncate">{{ subscriptionNavItem.label }}</span>
             </NuxtLink>
           </nav>
 

@@ -27,6 +27,7 @@
     "invoices": "Facturas",
     "reports": "Informes",
     "settings": "Configuración",
+    "subscription": "Suscripción",
     "catalog": "Catálogo",
     "platformClinics": "Clínicas (plataforma)",
     "menu": "Menú",
@@ -1173,6 +1174,10 @@
     "clinicName": "Nombre de la clínica",
     "clinicInfo": "Información de la Clínica",
     "clinicInfoDescription": "Estos datos aparecerán en presupuestos y documentos",
+    "subscription": {
+      "title": "Suscripción EBYZOM",
+      "description": "Paga la suscripción mensual del sistema (Culqi: tarjeta o Yape)."
+    },
     "taxId": "RUC",
     "legalName": "Razón social",
     "legalNameHelp": "Nombre legal de la entidad para facturación. Si lo dejas vacío, se usará el nombre de la clínica.",

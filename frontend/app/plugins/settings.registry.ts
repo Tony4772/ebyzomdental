@@ -83,6 +83,20 @@ export default defineNuxtPlugin(() => {
     searchKeywords: ['iva', 'vat', 'impuesto', 'tax'],
     order: 20
   })
+  registerSettingsPage({
+    path: 'subscription',
+    category: 'billing',
+    labelKey: 'settings.subscription.title',
+    descriptionKey: 'settings.subscription.description',
+    icon: 'i-lucide-credit-card',
+    permission: 'admin.users.write',
+    to: '/subscription',
+    searchKeywords: [
+      'suscripcion', 'subscription', 'pago', 'culqi', 'yape', 'tarjeta',
+      'ebyzom', 'mensualidad', 'plan'
+    ],
+    order: 5
+  })
 
   // ---- Communications (module-provided pages) ----------------------
   registerSettingsPage({

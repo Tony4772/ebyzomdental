@@ -27,6 +27,7 @@
     "invoices": "Invoices",
     "reports": "Reports",
     "settings": "Settings",
+    "subscription": "Subscription",
     "defaultClinicName": "Clinic",
     "catalog": "Catalog",
     "platformClinics": "Clinics (platform)",
@@ -1154,6 +1155,10 @@
     "clinicName": "Clinic name",
     "clinicInfo": "Clinic Information",
     "clinicInfoDescription": "This data will appear on quotes and documents",
+    "subscription": {
+      "title": "EBYZOM subscription",
+      "description": "Pay the monthly system subscription (Culqi: card or Yape)."
+    },
     "taxId": "Tax ID",
     "legalName": "Legal name",
     "legalNameHelp": "Legal name of the entity for invoicing. Leave blank to use the clinic name.",

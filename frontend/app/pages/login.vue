@@ -164,14 +164,14 @@ watch(() => formState.password, () => {
 
     <!-- Right: login form -->
     <section class="flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-14 xl:px-20">
-      <!-- Mobile hero strip -->
-      <div class="lg:hidden mb-6 -mx-6 -mt-10 sm:-mx-10 bg-[var(--color-primary)]/5">
+      <!-- Mobile hero strip — full-bleed photo (same asset as desktop) -->
+      <div class="lg:hidden mb-6 -mx-6 -mt-10 sm:-mx-10">
         <img
-          src="/og-image.png"
+          src="/login-hero.png"
           :alt="t('seo.ogImageAlt')"
-          class="w-full h-auto max-h-44 object-contain object-center"
+          class="w-full h-48 sm:h-56 object-cover object-top"
           width="1200"
-          height="630"
+          height="1200"
         >
       </div>
 
