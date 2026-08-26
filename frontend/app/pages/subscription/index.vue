@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /**
- * Clinic admin: pay SaaS subscription via Culqi (card / Yape).
+ * Clinic admin: pay SaaS subscription via Culqi Checkout Custom (card / Yape).
+ * Integration follows Culqi docs: ``new CulqiCheckout(publicKey, config)`` + ``Culqi.culqi``.
  */
 import type { ApiResponse } from '~/types'
 
@@ -19,6 +20,24 @@ interface ClinicSubscriptionStatus {
   period_days: number
   culqi_public_key: string
 }
+
+interface CulqiToken {
+  id: string
+}
+
+interface CulqiInstance {
+  open: () => void
+  close: () => void
+  token?: CulqiToken | null
+  order?: { id?: string } | null
+  error?: { user_message?: string, merchant_message?: string, message?: string } | null
+  culqi: (() => void) | null
+}
+
+type CulqiCheckoutCtor = new (
+  publicKey: string,
+  config: Record<string, unknown>
+) => CulqiInstance
 
 const { t } = useI18n()
 const api = useApi()
@@ -70,6 +89,32 @@ function loadCulqiScript(): Promise<void> {
   })
 }
 
+async function confirmCharge(sourceId: string) {
+  const email = auth.user.value?.email || ''
+  if (!email) {
+    payError.value = t('platform.subscription.payEmailRequired')
+    isPaying.value = false
+    return
+  }
+  const method = String(sourceId).startsWith('ype_') ? 'yape' : 'card'
+  try {
+    await api.post('/api/v1/subscriptions/me/pay', {
+      source_id: sourceId,
+      email,
+      method
+    })
+    toast.add({ title: t('platform.subscription.paySuccess'), color: 'success' })
+    await load()
+    await navigateTo('/')
+  } catch (err: unknown) {
+    const detail = (err as { data?: { detail?: string }, message?: string }).data?.detail
+      || (err as { message?: string }).message
+    payError.value = detail ? String(detail) : t('platform.subscription.payFailed')
+  } finally {
+    isPaying.value = false
+  }
+}
+
 async function startPayment() {
   if (!status.value?.price_cents || !status.value.culqi_public_key) {
     payError.value = t('platform.subscription.payNotConfigured')
@@ -79,15 +124,24 @@ async function startPayment() {
   isPaying.value = true
   try {
     await loadCulqiScript()
-    const CulqiCheckout = (window as unknown as {
-      CulqiCheckout: new (opts: Record<string, unknown>) => {
-        open: () => void
-        on: (event: string, cb: (payload: { id?: string; token?: string }) => void) => void
-      }
-    }).CulqiCheckout
+    const CulqiCheckout = (window as unknown as { CulqiCheckout?: CulqiCheckoutCtor }).CulqiCheckout
+    if (!CulqiCheckout) {
+      payError.value = t('platform.subscription.payCulqiLoadError')
+      isPaying.value = false
+      return
+    }
 
     const email = auth.user.value?.email || ''
-    const culqi = new CulqiCheckout({
+    const paymentMethods = {
+      tarjeta: true,
+      yape: true,
+      billetera: false,
+      bancaMovil: false,
+      agente: false,
+      cuotealo: false
+    }
+
+    const config = {
       settings: {
         title: 'EBYZOM Dental',
         currency: status.value.currency || 'PEN',
@@ -95,52 +149,44 @@ async function startPayment() {
       },
       client: { email },
       options: {
-        paymentMethods: {
-          tarjeta: true,
-          yape: true,
-          billetera: false,
-          bancaMovil: false,
-          agente: false,
-          cuotealo: false
-        }
+        lang: 'es',
+        installments: false,
+        modal: true,
+        paymentMethods,
+        paymentMethodsSort: Object.keys(paymentMethods)
       },
-      appearance: { theme: 'default' },
-      publicKey: status.value.culqi_public_key
-    })
+      appearance: { theme: 'default' }
+    }
 
-    culqi.on('payment', async (payload) => {
-      const sourceId = payload.id || payload.token
-      if (!sourceId) {
-        payError.value = t('platform.subscription.payFailed')
-        isPaying.value = false
+    const Culqi = new CulqiCheckout(status.value.culqi_public_key, config)
+
+    Culqi.culqi = () => {
+      if (Culqi.token?.id) {
+        const tokenId = Culqi.token.id
+        try { Culqi.close() } catch { /* ignore */ }
+        void confirmCharge(tokenId)
         return
       }
-      try {
-        const method = String(sourceId).startsWith('ype_') ? 'yape' : 'card'
-        await api.post('/api/v1/subscriptions/me/pay', {
-          source_id: sourceId,
-          email,
-          method
-        })
-        toast.add({ title: t('platform.subscription.paySuccess'), color: 'success' })
-        await load()
-        await navigateTo('/')
-      } catch (err: unknown) {
-        const detail = (err as { data?: { detail?: string }, message?: string }).data?.detail
-          || (err as { message?: string }).message
-        payError.value = detail || t('platform.subscription.payFailed')
-      } finally {
-        isPaying.value = false
+      if (Culqi.order?.id) {
+        // Yape / deferred methods may return an order; charge uses source_id when available.
+        const orderId = Culqi.order.id
+        try { Culqi.close() } catch { /* ignore */ }
+        void confirmCharge(orderId)
+        return
       }
-    })
-
-    culqi.on('close', () => {
+      const msg = Culqi.error?.user_message
+        || Culqi.error?.merchant_message
+        || Culqi.error?.message
+      payError.value = msg || t('platform.subscription.payFailed')
       isPaying.value = false
-    })
+    }
 
-    culqi.open()
-  } catch {
-    payError.value = t('platform.subscription.payFailed')
+    Culqi.open()
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : ''
+    payError.value = msg.includes('Culqi script')
+      ? t('platform.subscription.payCulqiLoadError')
+      : t('platform.subscription.payFailed')
     isPaying.value = false
   }
 }
@@ -194,6 +240,12 @@ onMounted(load)
         </p>
         <p class="text-caption text-subtle">
           {{ t('platform.subscription.graceHint', { days: status.grace_days }) }}
+        </p>
+        <p
+          v-if="status.access_state === 'ok'"
+          class="text-caption text-muted"
+        >
+          {{ t('platform.subscription.payEarlyHint') }}
         </p>
 
         <div

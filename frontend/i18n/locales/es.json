@@ -110,6 +110,9 @@
       "paySuccess": "Pago registrado. Suscripción renovada 30 días.",
       "payFailed": "No se pudo completar el pago",
       "payNotConfigured": "Culqi no está configurado o la clínica no tiene precio.",
+      "payCulqiLoadError": "No se pudo cargar Culqi. Revisa la conexión e inténtalo de nuevo.",
+      "payEmailRequired": "Tu cuenta no tiene correo; no se puede iniciar el pago.",
+      "payEarlyHint": "Tu suscripción está al día. Si pagas ahora, se suman 30 días a la fecha de vencimiento actual.",
       "graceHint": "Tras el vencimiento hay {days} días de gracia antes de suspender el acceso.",
       "days": "días"
     }
