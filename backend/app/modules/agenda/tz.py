@@ -22,7 +22,7 @@ from app.core.auth.models import Clinic
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_TIMEZONE = "Europe/Madrid"
+DEFAULT_TIMEZONE = "America/Lima"
 
 
 def safe_zone(tz_name: str | None) -> ZoneInfo:

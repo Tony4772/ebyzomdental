@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { PERMISSIONS } from '~/config/permissions'
+
 definePageMeta({
   layout: 'guest'
 })
 
 const { t } = useI18n()
+const { can } = usePermissions()
 const api = useApi()
 const auth = useAuth()
 const toast = useToast()
@@ -84,7 +87,8 @@ async function onSubmit() {
     await auth.login({ email: form.email.trim(), password: form.password })
 
     toast.add({ title: t('setup.success'), color: 'success' })
-    await navigateTo('/')
+    const home = can(PERMISSIONS.platform.clinicsProvision) ? '/platform/clinics' : '/'
+    await navigateTo(home)
   } catch (error: unknown) {
     const status = (error as { statusCode?: number }).statusCode
     if (status === 409) {

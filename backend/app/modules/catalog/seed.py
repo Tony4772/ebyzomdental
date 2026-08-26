@@ -38,31 +38,20 @@ from .models import (
 VAT_TYPES: list[dict[str, Any]] = [
     {
         "key": "exempt",
-        "names": {"es": "Exento", "en": "Exempt", "fr": "Exonéré", "ta": "விலக்கு"},
+        "names": {"es": "Exonerado", "en": "Exempt", "fr": "Exonéré", "ta": "விலக்கு"},
         "rate": 0.0,
+        "is_default": False,
+    },
+    {
+        "key": "igv",
+        "names": {
+            "es": "IGV (18%)",
+            "en": "IGV (18%)",
+            "fr": "IGV (18%)",
+            "ta": "IGV (18%)",
+        },
+        "rate": 18.0,
         "is_default": True,
-    },
-    {
-        "key": "reduced",
-        "names": {
-            "es": "Reducido (10%)",
-            "en": "Reduced (10%)",
-            "fr": "Réduit (10%)",
-            "ta": "குறைக்கப்பட்டது (10%)",
-        },
-        "rate": 10.0,
-        "is_default": False,
-    },
-    {
-        "key": "standard",
-        "names": {
-            "es": "General (21%)",
-            "en": "Standard (21%)",
-            "fr": "Général (21%)",
-            "ta": "பொதுவானது (21%)",
-        },
-        "rate": 21.0,
-        "is_default": False,
     },
 ]
 

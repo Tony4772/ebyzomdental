@@ -19,6 +19,7 @@ from app.database import get_db
 
 from .dependencies import (
     ClinicContext,
+    assert_clinic_access,
     get_clinic_context,
     get_current_user,
     require_permission,
@@ -42,6 +43,7 @@ from .schemas import (
     ClinicResponse,
     MeResponse,
     PlatformClinicSummary,
+    PlatformClinicStatusUpdate,
     ProfessionalResponse,
     SetupStatusResponse,
     SystemSetup,
@@ -132,9 +134,9 @@ async def setup(
     clinic = Clinic(
         name=data.clinic_name,
         tax_id=data.clinic_tax_id,
-        timezone=data.timezone or "Europe/Madrid",
-        currency=data.currency or "EUR",
-        settings={"communication_language": "es"},
+        timezone=data.timezone or "America/Lima",
+        currency=data.currency or "PEN",
+        settings={"communication_language": "es", "country": "PE"},
     )
     db.add(clinic)
     await db.flush()
@@ -150,6 +152,10 @@ async def setup(
     await db.flush()
 
     db.add(ClinicMembership(user_id=user.id, clinic_id=clinic.id, role="admin"))
+    # Peru defaults: IGV tax types for billing.
+    from app.modules.catalog.service import VatTypeService
+
+    await VatTypeService.ensure_default_vat_types(db, clinic.id)
     await db.commit()
 
     access_token = create_access_token(
@@ -158,6 +164,18 @@ async def setup(
     refresh_token = create_refresh_token(user.id, token_version=user.token_version)
 
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+def _platform_clinic_summary(clinic: Clinic) -> PlatformClinicSummary:
+    return PlatformClinicSummary(
+        id=clinic.id,
+        name=clinic.name,
+        tax_id=clinic.tax_id,
+        timezone=clinic.timezone,
+        currency=clinic.currency,
+        status=clinic.status,
+        created_at=clinic.created_at.isoformat() if clinic.created_at else "",
+    )
 
 
 @router.get(
@@ -171,17 +189,7 @@ async def list_platform_clinics(
     """List every clinic on this instance (platform operator only)."""
     result = await db.execute(select(Clinic).order_by(Clinic.created_at.asc()))
     clinics = result.scalars().all()
-    items = [
-        PlatformClinicSummary(
-            id=c.id,
-            name=c.name,
-            tax_id=c.tax_id,
-            timezone=c.timezone,
-            currency=c.currency,
-            created_at=c.created_at.isoformat() if c.created_at else "",
-        )
-        for c in clinics
-    ]
+    items = [_platform_clinic_summary(c) for c in clinics]
     return PaginatedApiResponse(
         data=items,
         total=len(items),
@@ -223,9 +231,9 @@ async def provision_clinic(
     clinic = Clinic(
         name=data.clinic_name,
         tax_id=data.clinic_tax_id,
-        timezone=data.timezone or "Europe/Madrid",
-        currency=data.currency or "EUR",
-        settings={"communication_language": "es"},
+        timezone=data.timezone or "America/Lima",
+        currency=data.currency or "PEN",
+        settings={"communication_language": "es", "country": "PE"},
     )
     db.add(clinic)
     await db.flush()
@@ -241,23 +249,59 @@ async def provision_clinic(
     await db.flush()
 
     db.add(ClinicMembership(user_id=admin.id, clinic_id=clinic.id, role="admin"))
+    from app.modules.catalog.service import VatTypeService
+
+    await VatTypeService.ensure_default_vat_types(db, clinic.id)
     await db.commit()
     await db.refresh(clinic)
     await db.refresh(admin)
 
     return ApiResponse(
         data=ClinicProvisionResponse(
-            clinic=PlatformClinicSummary(
-                id=clinic.id,
-                name=clinic.name,
-                tax_id=clinic.tax_id,
-                timezone=clinic.timezone,
-                currency=clinic.currency,
-                created_at=clinic.created_at.isoformat() if clinic.created_at else "",
-            ),
+            clinic=_platform_clinic_summary(clinic),
             admin=UserResponse.model_validate(admin),
         )
     )
+
+
+@router.patch(
+    "/platform/clinics/{clinic_id}",
+    response_model=ApiResponse[PlatformClinicSummary],
+)
+async def update_platform_clinic(
+    clinic_id: UUID,
+    body: PlatformClinicStatusUpdate,
+    _: Annotated[User, Depends(require_platform_operator)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> ApiResponse[PlatformClinicSummary]:
+    """Edit metadata or pause/block/delete/reactivate a customer clinic."""
+    result = await db.execute(select(Clinic).where(Clinic.id == clinic_id))
+    clinic = result.scalar_one_or_none()
+    if clinic is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Clinic not found")
+
+    updates = body.model_dump(exclude_unset=True)
+    if not updates:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="No fields to update",
+        )
+
+    if "name" in updates and updates["name"] is not None:
+        clinic.name = updates["name"]
+    if "tax_id" in updates and updates["tax_id"] is not None:
+        clinic.tax_id = updates["tax_id"]
+    if "timezone" in updates and updates["timezone"] is not None:
+        clinic.timezone = updates["timezone"]
+    if "currency" in updates and updates["currency"] is not None:
+        clinic.currency = updates["currency"]
+    if "status" in updates and updates["status"] is not None:
+        clinic.status = updates["status"]
+
+    await db.commit()
+    await db.refresh(clinic)
+
+    return ApiResponse(data=_platform_clinic_summary(clinic))
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -291,6 +335,10 @@ async def login(
     clinic_id = None
     if user.memberships:
         clinic_id = user.memberships[0].clinic_id
+        if not user.is_platform_operator:
+            clinic_row = await db.get(Clinic, clinic_id)
+            if clinic_row is not None:
+                assert_clinic_access(user, clinic_row)
 
     # Generate tokens
     access_token = create_access_token(
@@ -402,6 +450,9 @@ async def get_me(
         .where(ClinicMembership.user_id == current_user.id)
     )
     memberships = result.scalars().all()
+
+    if memberships and not current_user.is_platform_operator:
+        assert_clinic_access(current_user, memberships[0].clinic)
 
     clinics = [
         ClinicResponse(

@@ -20,6 +20,19 @@ from .service import decode_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
+_CLINIC_SUSPENDED_STATUSES = frozenset({"paused", "blocked", "deleted"})
+
+
+def assert_clinic_access(user: User, clinic: Clinic) -> None:
+    """Block clinic staff when the clinic is paused or blocked."""
+    if user.is_platform_operator:
+        return
+    if clinic.status in _CLINIC_SUSPENDED_STATUSES:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Clinic access is suspended",
+        )
+
 
 class ClinicContext:
     """Context object containing current user and clinic."""
@@ -115,6 +128,8 @@ async def get_clinic_context(
             )
     else:
         membership = memberships[0]
+
+    assert_clinic_access(current_user, membership.clinic)
 
     # Bind clinic_id + user_id onto the per-request logging context so
     # every log line and event emitted inside this handler carries

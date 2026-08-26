@@ -85,9 +85,9 @@ async function onSubmit() {
       color: 'success'
     })
 
-    // Platform operators land on clinic provisioning, not the clinic dashboard.
+    // Platform operators land on the system admin panel, not a clinic dashboard.
     const home = can(PERMISSIONS.platform.clinicsProvision)
-      ? '/settings/platform/clinics'
+      ? '/platform/clinics'
       : '/'
     await navigateTo(home)
   } catch (error: unknown) {

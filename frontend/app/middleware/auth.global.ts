@@ -1,4 +1,5 @@
 const SETUP_PATH = '/setup'
+const PLATFORM_HOME = '/platform/clinics'
 
 // Module-level cache. The system can only flip from uninitialized → initialized
 // (never back), so once we've seen `true` we stop asking the backend.
@@ -24,6 +25,7 @@ async function isSystemInitialized(): Promise<boolean> {
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const auth = useAuth()
+  const { can } = usePermissions()
 
   // ``/p/budget/<token>`` is the patient-facing budget view (ADR 0006),
   // authorized server-side via a token-scoped 2FA cookie; let it render.
@@ -34,6 +36,26 @@ export default defineNuxtRouteMiddleware(async (to) => {
   await auth.init()
 
   if (auth.isAuthenticated.value) {
+    const isPlatformOperator =
+      auth.user.value?.is_platform_operator === true
+      || can('platform.clinics.provision')
+
+    if (isPlatformOperator) {
+      // System owner: only the platform admin surface (+ login redirect).
+      if (to.path === '/login' || to.path === SETUP_PATH) {
+        return navigateTo(PLATFORM_HOME)
+      }
+      if (to.path.startsWith('/platform')) {
+        return
+      }
+      return navigateTo(PLATFORM_HOME)
+    }
+
+    // Clinic staff must not access platform routes.
+    if (to.path.startsWith('/platform')) {
+      return navigateTo('/')
+    }
+
     // Authenticated users skip both the login page and the first-run wizard.
     if (to.path === '/login' || to.path === SETUP_PATH) return navigateTo('/')
     return

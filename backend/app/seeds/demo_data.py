@@ -100,35 +100,37 @@ def get_clinic_data() -> dict:
         "address": {
             "street": t(
                 {
-                    "es": "Calle Gran Vía 123",
+                    "es": "Av. Javier Prado Este 123",
                     "en": "123 Main Street",
                     "fr": "123 Rue Principale",
                     "ta": "123 மெயின் தெரு",
                 }
             ),
-            "city": t({"es": "Madrid", "en": "New York", "fr": "Paris", "ta": "சென்னை"}),
-            "postal_code": t({"es": "28013", "en": "10001", "fr": "75001", "ta": "600001"}),
-            "country": t({"es": "España", "en": "USA", "fr": "France", "ta": "இந்தியா"}),
+            "city": t({"es": "Lima", "en": "New York", "fr": "Paris", "ta": "சென்னை"}),
+            "postal_code": t({"es": "15001", "en": "10001", "fr": "75001", "ta": "600001"}),
+            "country": t({"es": "Perú", "en": "USA", "fr": "France", "ta": "இந்தியா"}),
         },
         "phone": t(
             {
-                "es": "+34 912 345 678",
+                "es": "+51 1 234 5678",
                 "en": "+1 (212) 555-0100",
                 "fr": "+33 1 23 45 67 89",
                 "ta": "+91 98401 23456",
             }
         ),
         "email": "info@demo.clinic",
-        "currency": t({"es": "EUR", "en": "USD", "fr": "EUR", "ta": "INR"}),
+        "currency": t({"es": "PEN", "en": "USD", "fr": "EUR", "ta": "INR"}),
         "timezone": t(
             {
-                "es": "Europe/Madrid",
+                "es": "America/Lima",
                 "en": "America/New_York",
                 "fr": "Europe/Paris",
                 "ta": "Asia/Kolkata",
             }
         ),
         "settings": {
+            "country": "PE",
+            "communication_language": "es",
             "slot_duration_min": 30,
             "working_hours": {
                 "monday": {"morning": ["09:00", "14:00"], "afternoon": ["16:00", "20:00"]},

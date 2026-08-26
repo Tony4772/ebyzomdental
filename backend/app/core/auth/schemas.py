@@ -266,9 +266,32 @@ class PlatformClinicSummary(BaseModel):
     tax_id: str
     timezone: str
     currency: str
+    status: str
     created_at: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PlatformClinicUpdate(BaseModel):
+    """Update customer clinic metadata and/or lifecycle status."""
+
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    tax_id: str | None = Field(default=None, min_length=1, max_length=20)
+    timezone: str | None = Field(default=None, max_length=64)
+    currency: str | None = Field(default=None, pattern="^[A-Z]{3}$")
+    status: str | None = Field(
+        default=None,
+        pattern="^(active|paused|blocked|deleted)$",
+    )
+
+    @field_validator("timezone")
+    @classmethod
+    def validate_timezone(cls, value: str | None) -> str | None:
+        return _validate_iana_timezone(value)
+
+
+# Back-compat alias used by older imports/tests.
+PlatformClinicStatusUpdate = PlatformClinicUpdate
 
 
 class ClinicProvisionResponse(BaseModel):

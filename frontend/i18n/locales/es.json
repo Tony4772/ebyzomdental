@@ -30,6 +30,36 @@
     "toggleSidebar": "Alternar barra lateral",
     "defaultClinicName": "Clínica"
   },
+  "platform": {
+    "panelBadge": "Administración de plataforma",
+    "panelTitle": "Clínicas clientes",
+    "panelDescription": "Gestiona las clínicas que contratan EBYZOM Dental: créalas, edítalas, pausa el acceso o elimínalas.",
+    "nav": {
+      "clinics": "Clínicas"
+    },
+    "status": {
+      "active": "Activa",
+      "paused": "Pausada",
+      "blocked": "Bloqueada",
+      "deleted": "Eliminada"
+    },
+    "actions": {
+      "pause": "Pausar",
+      "block": "Bloquear",
+      "reactivate": "Reactivar",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "statusUpdated": "Estado actualizado",
+    "statusUpdateError": "No se pudo actualizar el estado",
+    "editTitle": "Editar clínica",
+    "editSaved": "Clínica actualizada",
+    "editError": "No se pudo guardar los cambios",
+    "deleteTitle": "Eliminar clínica",
+    "deleteConfirm": "¿Eliminar «{clinic}»? Sus usuarios no podrán entrar. Los datos fiscales se conservan y podrás reactivarla después.",
+    "timezone": "Zona horaria",
+    "currency": "Moneda"
+  },
   "auth": {
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
@@ -1057,7 +1087,7 @@
       "createTitle": "Provisionar clínica",
       "createHint": "Se creará la clínica y su primer administrador. Entrégale el correo y la contraseña al cliente.",
       "clinicName": "Nombre de la clínica",
-      "taxId": "CIF / NIF",
+      "taxId": "RUC",
       "adminSection": "Administrador de la clínica",
       "firstName": "Nombre",
       "lastName": "Apellidos",
@@ -1089,7 +1119,7 @@
     "clinicName": "Nombre de la clínica",
     "clinicInfo": "Información de la Clínica",
     "clinicInfoDescription": "Estos datos aparecerán en presupuestos y documentos",
-    "taxId": "CIF/NIF",
+    "taxId": "RUC",
     "legalName": "Razón social",
     "legalNameHelp": "Nombre legal de la entidad para facturación. Si lo dejas vacío, se usará el nombre de la clínica.",
     "street": "Dirección",

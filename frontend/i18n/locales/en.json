@@ -30,6 +30,36 @@
     "close": "Close",
     "toggleSidebar": "Toggle sidebar"
   },
+  "platform": {
+    "panelBadge": "Platform administration",
+    "panelTitle": "Customer clinics",
+    "panelDescription": "Manage clinics that subscribe to EBYZOM Dental: create, edit, pause access, or remove them.",
+    "nav": {
+      "clinics": "Clinics"
+    },
+    "status": {
+      "active": "Active",
+      "paused": "Paused",
+      "blocked": "Blocked",
+      "deleted": "Deleted"
+    },
+    "actions": {
+      "pause": "Pause",
+      "block": "Block",
+      "reactivate": "Reactivate",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "statusUpdated": "Status updated",
+    "statusUpdateError": "Could not update status",
+    "editTitle": "Edit clinic",
+    "editSaved": "Clinic updated",
+    "editError": "Could not save changes",
+    "deleteTitle": "Delete clinic",
+    "deleteConfirm": "Delete “{clinic}”? Its users will lose access. Fiscal data is kept and you can reactivate it later.",
+    "timezone": "Timezone",
+    "currency": "Currency"
+  },
   "auth": {
     "login": "Log in",
     "logout": "Log out",

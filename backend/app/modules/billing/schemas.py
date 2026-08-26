@@ -336,7 +336,7 @@ class BillingAddress(BaseModel):
     city: str | None = None
     postal_code: str | None = None
     province: str | None = None
-    country: str = "ES"
+    country: str = "PE"
 
 
 class InvoiceCreate(BaseModel):

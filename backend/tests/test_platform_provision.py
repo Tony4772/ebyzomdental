@@ -219,3 +219,121 @@ async def test_provision_duplicate_email_conflict(
         headers=headers,
     )
     assert second.status_code == 409, second.text
+
+
+@pytest.mark.asyncio
+async def test_operator_updates_clinic_status(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    headers = await _operator_headers(db_session)
+    created = await client.post(
+        "/api/v1/auth/platform/clinics",
+        json=_provision_payload(clinic_name="Status Test Clinic"),
+        headers=headers,
+    )
+    assert created.status_code == 201, created.text
+    clinic_id = created.json()["data"]["clinic"]["id"]
+
+    paused = await client.patch(
+        f"/api/v1/auth/platform/clinics/{clinic_id}",
+        json={"status": "paused"},
+        headers=headers,
+    )
+    assert paused.status_code == 200, paused.text
+    assert paused.json()["data"]["status"] == "paused"
+
+    blocked = await client.patch(
+        f"/api/v1/auth/platform/clinics/{clinic_id}",
+        json={"status": "blocked"},
+        headers=headers,
+    )
+    assert blocked.status_code == 200, blocked.text
+    assert blocked.json()["data"]["status"] == "blocked"
+
+    active = await client.patch(
+        f"/api/v1/auth/platform/clinics/{clinic_id}",
+        json={"status": "active"},
+        headers=headers,
+    )
+    assert active.status_code == 200, active.text
+    assert active.json()["data"]["status"] == "active"
+
+
+@pytest.mark.asyncio
+async def test_operator_edits_and_soft_deletes_clinic(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    headers = await _operator_headers(db_session)
+    created = await client.post(
+        "/api/v1/auth/platform/clinics",
+        json=_provision_payload(clinic_name="Editable Clinic"),
+        headers=headers,
+    )
+    assert created.status_code == 201, created.text
+    clinic_id = created.json()["data"]["clinic"]["id"]
+
+    edited = await client.patch(
+        f"/api/v1/auth/platform/clinics/{clinic_id}",
+        json={
+            "name": "Clínica Renombrada",
+            "tax_id": "20123456789",
+            "timezone": "America/Lima",
+            "currency": "PEN",
+        },
+        headers=headers,
+    )
+    assert edited.status_code == 200, edited.text
+    data = edited.json()["data"]
+    assert data["name"] == "Clínica Renombrada"
+    assert data["tax_id"] == "20123456789"
+    assert data["status"] == "active"
+
+    deleted = await client.patch(
+        f"/api/v1/auth/platform/clinics/{clinic_id}",
+        json={"status": "deleted"},
+        headers=headers,
+    )
+    assert deleted.status_code == 200, deleted.text
+    assert deleted.json()["data"]["status"] == "deleted"
+
+
+@pytest.mark.asyncio
+async def test_clinic_admin_cannot_update_platform_status(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    headers = await _clinic_admin_headers(db_session)
+    clinic_id = (await db_session.scalar(select(Clinic.id).limit(1)))
+    assert clinic_id is not None
+
+    r = await client.patch(
+        f"/api/v1/auth/platform/clinics/{clinic_id}",
+        json={"status": "paused"},
+        headers=headers,
+    )
+    assert r.status_code == 403, r.text
+
+
+@pytest.mark.asyncio
+async def test_paused_clinic_blocks_member_access(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    admin_headers = await _clinic_admin_headers(db_session)
+    me = await client.get("/api/v1/auth/me", headers=admin_headers)
+    assert me.status_code == 200
+    clinic_id = me.json()["data"]["clinic"]["id"]
+
+    operator_headers = await _operator_headers(db_session)
+    pause = await client.patch(
+        f"/api/v1/auth/platform/clinics/{clinic_id}",
+        json={"status": "paused"},
+        headers=operator_headers,
+    )
+    assert pause.status_code == 200, pause.text
+
+    blocked_me = await client.get("/api/v1/auth/me", headers=admin_headers)
+    assert blocked_me.status_code == 403, blocked_me.text
+    assert "suspended" in blocked_me.json()["detail"].lower()

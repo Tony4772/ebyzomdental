@@ -635,7 +635,7 @@ class BudgetPDFService:
             "total": "Total",
             "subtotal": "Subtotal",
             "total_discount": "Descuento total",
-            "tax": "IVA",
+            "tax": "IGV",
             "grand_total": "TOTAL",
             "validity": "Validez",
             "from": "desde",

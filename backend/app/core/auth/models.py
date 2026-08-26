@@ -32,11 +32,14 @@ class Clinic(Base, TimestampMixin):
     # for any module that needs local-time semantics — schedules,
     # reports, future billing date-windows, etc.
     timezone: Mapped[str] = mapped_column(
-        String(64), nullable=False, server_default="Europe/Madrid"
+        String(64), nullable=False, server_default="America/Lima"
     )
     # ISO 4217 currency code. Single source of truth for any module
     # that renders money — budgets, invoices, catalog, reports.
-    currency: Mapped[str] = mapped_column(String(3), nullable=False, server_default="EUR")
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, server_default="PEN")
+    # Platform lifecycle: active clinics operate normally; paused/blocked
+    # reject clinic-scoped API access for their staff.
+    status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="active")
     settings: Mapped[dict] = mapped_column(JSONB, default=dict)
 
     # Relationships

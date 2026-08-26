@@ -98,8 +98,8 @@ const form = ref({
   country: '',
   phone: '',
   email: '',
-  timezone: 'Europe/Madrid',
-  currency: 'EUR'
+  timezone: 'America/Lima',
+  currency: 'PEN'
 })
 
 function loadForm() {
@@ -111,11 +111,11 @@ function loadForm() {
     street: c?.address?.street || '',
     city: c?.address?.city || '',
     postal_code: c?.address?.postal_code || '',
-    country: c?.address?.country || '',
+    country: c?.address?.country || 'PE',
     phone: c?.phone || '',
     email: c?.email || '',
-    timezone: c?.timezone || 'Europe/Madrid',
-    currency: c?.currency || 'EUR'
+    timezone: c?.timezone || 'America/Lima',
+    currency: c?.currency || 'PEN'
   }
 }
 

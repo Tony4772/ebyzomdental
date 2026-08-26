@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { PERMISSIONS } from '~/config/permissions'
-
 const { t } = useI18n()
 const auth = useAuth()
 const clinic = useClinic()
@@ -8,8 +6,6 @@ const { navigationItems, ensureLoaded } = useModules()
 const { init: initDensity } = useDensity()
 const { isTablet } = useBreakpoint()
 const route = useRoute()
-const { can } = usePermissions()
-const isPlatformOperator = computed(() => can(PERMISSIONS.platform.clinicsProvision))
 
 // Pull the backend-driven nav on mount + on every route change, so
 // sidebar reflects module installs/upgrades without a full reload.
@@ -68,16 +64,19 @@ async function handleLogout() {
   await auth.logout()
 }
 
-const settingsItem = computed(() => navigationItems.value.find(i => i.to === '/settings'))
 const mainNavItems = computed(() => navigationItems.value.filter(i => i.to !== '/settings'))
+
+// Footer shortcut — always available when logged in; must not depend on
+// the async modules nav fetch (operators were losing the cog otherwise).
+const settingsFooterLink = {
+  to: '/settings',
+  icon: 'i-lucide-settings'
+} as const
 
 // Check if nav item is active
 function isActive(to: string): boolean {
   if (to === '/') {
     return route.path === '/'
-  }
-  if (to === '/settings/platform/clinics') {
-    return route.path.startsWith('/settings/platform')
   }
   if (route.path === to) {
     return true
@@ -127,27 +126,6 @@ function isActive(to: string): boolean {
       <!-- Navigation -->
       <nav class="flex-1 px-2 py-2 space-y-1 overflow-y-auto">
         <NuxtLink
-          v-if="isPlatformOperator"
-          to="/settings/platform/clinics"
-          class="group flex items-center gap-3 px-3 py-2 rounded-token-md text-ui transition-colors"
-          :class="[
-            isActive('/settings/platform/clinics')
-              ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary-soft-text)]'
-              : 'text-muted hover:bg-surface hover:text-default'
-          ]"
-        >
-          <UIcon
-            name="i-lucide-building-2"
-            class="w-[18px] h-[18px] shrink-0"
-          />
-          <span
-            v-if="!isSidebarCollapsed"
-            class="truncate"
-          >
-            {{ t('nav.platformClinics') }}
-          </span>
-        </NuxtLink>
-        <NuxtLink
           v-for="item in mainNavItems"
           :key="item.to"
           :to="item.to"
@@ -195,19 +173,18 @@ function isActive(to: string): boolean {
             </p>
           </div>
           <NuxtLink
-            v-if="settingsItem"
-            :to="settingsItem.to"
-            :title="settingsItem.label"
-            :aria-label="settingsItem.label"
+            :to="settingsFooterLink.to"
+            :title="t('nav.settings')"
+            :aria-label="t('nav.settings')"
             class="shrink-0 p-1.5 rounded-token-md transition-colors"
             :class="[
-              isActive(settingsItem.to)
+              isActive(settingsFooterLink.to)
                 ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary-soft-text)]'
                 : 'text-muted hover:bg-surface hover:text-default'
             ]"
           >
             <UIcon
-              :name="settingsItem.icon"
+              :name="settingsFooterLink.icon"
               class="w-[18px] h-[18px]"
             />
           </NuxtLink>
@@ -254,23 +231,6 @@ function isActive(to: string): boolean {
           <!-- Navigation -->
           <nav class="flex-1 px-2 py-2 space-y-1 overflow-y-auto">
             <NuxtLink
-              v-if="isPlatformOperator"
-              to="/settings/platform/clinics"
-              class="group flex items-center gap-3 px-3 py-3 rounded-token-md text-ui transition-colors"
-              :class="[
-                isActive('/settings/platform/clinics')
-                  ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary-soft-text)]'
-                  : 'text-muted hover:bg-surface hover:text-default'
-              ]"
-              @click="mobileNavOpen = false"
-            >
-              <UIcon
-                name="i-lucide-building-2"
-                class="w-5 h-5 shrink-0"
-              />
-              <span class="truncate">{{ t('nav.platformClinics') }}</span>
-            </NuxtLink>
-            <NuxtLink
               v-for="item in mainNavItems"
               :key="item.to"
               :to="item.to"
@@ -310,19 +270,18 @@ function isActive(to: string): boolean {
                 </p>
               </div>
               <NuxtLink
-                v-if="settingsItem"
-                :to="settingsItem.to"
-                :title="settingsItem.label"
-                :aria-label="settingsItem.label"
+                :to="settingsFooterLink.to"
+                :title="t('nav.settings')"
+                :aria-label="t('nav.settings')"
                 class="shrink-0 p-2 rounded-token-md transition-colors"
                 :class="[
-                  isActive(settingsItem.to)
+                  isActive(settingsFooterLink.to)
                     ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary-soft-text)]'
                     : 'text-muted hover:bg-surface hover:text-default'
                 ]"
               >
                 <UIcon
-                  :name="settingsItem.icon"
+                  :name="settingsFooterLink.icon"
                   class="w-5 h-5"
                 />
               </NuxtLink>

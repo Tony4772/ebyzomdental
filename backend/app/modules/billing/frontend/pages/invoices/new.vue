@@ -29,7 +29,7 @@ const form = ref({
     city: '',
     postal_code: '',
     province: '',
-    country: 'ES'
+    country: 'PE'
   },
   payment_term_days: 30,
   due_date: '',
